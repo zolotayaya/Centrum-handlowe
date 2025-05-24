@@ -1,7 +1,7 @@
 package org.example;
 import java.util.*;
 public class Boss {
-    private List<Empoyee> allEmployees;
+    private List<Employee> allEmployees;
     private List<Department> allDepartment;
     public String makeReport(){
         return "Hello";
