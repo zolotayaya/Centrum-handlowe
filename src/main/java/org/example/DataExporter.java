@@ -1,7 +1,6 @@
 package org.example;
 
 public class DataExporter {
-    public void exportToCSV(ReportData data, String filestring){
-
+    public void exportToCSV(ReportingService data, String filestring){
     }
 }
