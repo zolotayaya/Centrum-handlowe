@@ -1,6 +1,6 @@
 package org.example;
 
 public interface IPromotable {
-    public boolean chechPromotionCondition();
+    public boolean checkPromotionCondition();
     public void executePromotion();
 }
