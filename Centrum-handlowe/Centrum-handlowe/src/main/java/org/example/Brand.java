@@ -18,26 +18,7 @@ public class Brand {
 
     public void setExpert(Seller expert) {
         this.experts.add(expert);
-        // if (expert == null) {
-        //   System.out.println("An expert cannot be null");
-        //   return;
-        //  }
-//    for(int i = 0; i<experts.size(); i++) {
-//        if (this.experts.get(i) != null) {
-//        System.out.println("This brand already has an expert: " + this.experts.get(i).getName());
-//        return;
-//        }
-//        if (experts.get(i).getBrand() != null) {
-//        System.out.println("This seller is already assigned to another brand: " + experts.get(i).getBrand().getName());
-//        return;
-//        }
-//        if(!experts.get(i).getDepartment().equals(this.department)){
-//        System.out.println("This expert is from another department");
-//        return;
-//        }
-//
-//        this.experts.add(expert);
-//        expert.setBrand(this);
+
     }
 
 //        System.out.println("Expert is set");

@@ -1,7 +1,5 @@
 package org.example;
 
-import java.sql.Connection;
-
 public abstract class Empoyee {
     private int id;
     private String name;
@@ -12,9 +10,6 @@ public abstract class Empoyee {
         return 0;
     }
     public String showInformation(){
-        Database db = new Database();
-        Connection conn = db.getConnection();
-
         return "o";
     }
 }

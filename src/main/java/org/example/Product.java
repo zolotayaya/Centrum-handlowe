@@ -1,49 +1,47 @@
 package org.example;
 
-import java.util.*;
-
 public class Product {
-    private String model;
     private int id;
+    private String model;
     private float price;
     private int quantity;
     private String description;
-    public ArrayList<String> product_info = new ArrayList<>();
-    public void updateQuantity(int changes){
+    private Brand brand;
 
-    }
-    public void setName(String newName){
-        model = newName;
-    }
-    public String getName(){
-        return model;
-    }
-
-    public void setId(int ids){
-        this.id = ids;
-    }
-    public int getId(){
-        return id;
-    }
-
-    public void setPrice(float price){
+    public Product(String model, float price, int quantity,  String description, Brand brand) {
+        this.model = model;
         this.price = price;
-    }
-    public float getPrice(){
-        return price;
+        this.quantity = quantity;
+        this.description = description;
+        this.brand=brand;
+        if (brand!=null){
+            brand.addProduct(this);
+            System.out.println("This product was added to the Brand");
+        }
     }
 
-    public void setQuantity(int quantity){
-        this.quantity = quantity;
+    public String getDetails() {
+        return "Model: " + model + ", Price: " + price + ", Quantity: " + quantity + ", Description: " + description;
+    }
+    public float calculateFinalPrice(int quantity_sold ){
+        return price*quantity_sold;
+    }
+    public boolean updateQuantity(int quantity_sold) {
+        if (quantity_sold <= 0) {
+            System.out.println("The number of products sold must be positive");
+            return false;
+        }
+
+        if (quantity_sold > this.quantity) {
+            System.out.println("Not enough products in stock. Available: " + this.quantity);
+            return false;
+        }
+
+        this.quantity -= quantity_sold;
+        System.out.println("Sold " + quantity_sold + ". Available: " + this.quantity);
+        return true;
     }
     public int getQuantity(){
         return quantity;
-    }
-
-    public void setDescription(String description){
-        this.description = description;
-    }
-    public String getDescription(){
-        return description;
     }
 }

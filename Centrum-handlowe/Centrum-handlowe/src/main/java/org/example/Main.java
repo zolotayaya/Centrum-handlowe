@@ -19,7 +19,7 @@ public class Main extends Database {
         db.setBrandFromDB();
         db.setProductsFromDB();
         List<Brand> brands = db.getBrands();
-        List<Seller> selers = db.getSellers();// Отримуємо списки один раз
+        List<Seller> selers = db.getSellers();
         Set<Seller> assignedSellers = new HashSet<>();
         for (Brand brand : brands) {
             for (Seller seler : selers) {
