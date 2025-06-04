@@ -5,6 +5,7 @@ import java.util.*;
 public class Main extends Database {
     public static void main(String args[]) throws SQLException {
         Random rand = new Random();
+        Scanner sc = new Scanner(System.in);
         int liczba_Sprzedarzy_Za_Godzine = 1;
         int wydadki_za_produkty_higieny_na_osobe = 10;
         int wydatki_za_produkty_higieny = 0;
@@ -12,11 +13,17 @@ public class Main extends Database {
         double wydatki_zaswiatwo = 0;
         int liczba_osob_w_centrum = 0;
         Database db = Database.getInstance();
+        System.out.println("Podaj wachlarz doswiadczenie sprzedawcow");
+        System.out.println("Min: ");
+        int min = sc.nextInt();
+        System.out.println("Max: ");
+        int max = sc.nextInt();
         db.setDepartmentsFromDB();
         db.setManagersFromDB();
-        db.setSellersFromDB();
+        db.setSellersFromDB(min,max);
         db.setBrandFromDB();
         db.setProductsFromDB();
+        db.setExperience(min,max);
         List<Brand> brands = db.getBrands();
         List<Seller> selers = db.getSellers();
         Set<Seller> assignedSellers = new HashSet<>();
@@ -29,7 +36,6 @@ public class Main extends Database {
                 }
             }
         }
-        Scanner sc = new Scanner(System.in);
         System.out.println("Podaj liczbe godzin czynnosci centrum handlowe w ciagu dnia");
         int godziny = sc.nextInt();
         System.out.println();
@@ -37,12 +43,6 @@ public class Main extends Database {
         int liczba_dni = sc.nextInt();
         System.out.println("Podaj liczbe tygodni dzialania centrum");
         int liczba_tygodni = sc.nextInt();
-        System.out.println("Podaj wachlarz doswiadczenie sprzedawcow");
-        System.out.println("Min: ");
-        int min = sc.nextInt();
-        System.out.println("Max: ");
-        int max = sc.nextInt();
-        db.setExperience(min,max);
         SaleSystem system = new SaleSystem();
         int godzinyNaDzien = godziny;
         int dniNaTydzien = liczba_dni;
@@ -55,41 +55,53 @@ public class Main extends Database {
                     int randInt = rand.nextInt(db.getProducts().size());
                     Product product = db.getProducts().get(randInt);
                     Brand brand = product.getBrand();
+                    System.out.println("Brand" + brand.getName());
                     List<Seller> sellers = brand.getExperts();
-                    Seller seller = selers.get(rand.nextInt(sellers.size()));
-                    if(seller.getExperience()>=5) {
-                        for(int i = 0; i<3; i++) {
-                            system.processPurchase(product, seller, 1, 1);
-                            System.out.println("Sprzedano: " + product.getName());
-                            System.out.println("Quantity: " + product.getQuantity());
+                    Seller seller = sellers.get(rand.nextInt(sellers.size()));
+                    System.out.println(seller.getName());
+                    int quantity = 0;
+                    if(seller.getExperience()<3) {
+                         quantity += 1;
+                            system.processPurchase(product, seller, quantity, 1);
+                            System.out.println("Sprzedano: " + product.getName() + "pracownikiem " + seller.getName());
+                            System.out.println("Ilosc sprzedanych jednostek: " + quantity);
+                            System.out.println("Zostalo : " + product.getQuantity());
+                        System.out.println("Doświadczenie sprzedawcy " + seller.getName() + ": " + seller.getExperience());
                             db.updateQuantityInDB(product, product.getQuantity());
                             liczba_osob_w_centrum++;
-                        }
                     }
-                    else if(seller.getExperience()>=3 && seller.getExperience()<5) {
-                        for(int i = 0; i<2; i++) {
-                            system.processPurchase(product, seller, 1, 1);
-                            System.out.println("Sprzedano: " + product.getName());
-                            System.out.println("Quantity: " + product.getQuantity());
+                    else if(seller.getExperience()<5) {
+                        quantity += 2;
+                            system.processPurchase(product, seller, quantity, 1);
+                            System.out.println("Sprzedano: " + product.getName() + "pracownikiem " + seller.getName());
+                            System.out.println("Ilosc sprzedanych jednostek: " + quantity);
+                            System.out.println("Zostalo : " + product.getQuantity());
+                        System.out.println("Doświadczenie sprzedawcy " + seller.getName() + ": " + seller.getExperience());
                             db.updateQuantityInDB(product, product.getQuantity());
                             liczba_osob_w_centrum++;
-                        }
                     }
-                    else if(seller.getExperience()<3) {
-                        for(int i = 0; i<1; i++) {
-                            system.processPurchase(product, seller, 1, 1);
-                            System.out.println("Sprzedano: " + product.getName());
-                            System.out.println("Quantity: " + product.getQuantity());
-                            db.updateQuantityInDB(product, product.getQuantity());
-                            liczba_osob_w_centrum++;
-                        }
+                    else{
+                        quantity += 3;
+                        system.processPurchase(product, seller, quantity, 1);
+                        System.out.println("Sprzedano: " + product.getName() + "pracownikiem " + seller.getName());
+                        System.out.println("Ilosc sprzedanych jednostek: " + quantity);
+                        System.out.println("Zostalo : " + product.getQuantity());
+                        System.out.println("Doświadczenie sprzedawcy " + seller.getName() + ": " + seller.getExperience());
+                        db.updateQuantityInDB(product, product.getQuantity());
+                        liczba_osob_w_centrum++;
                     }
-                    System.out.println("Wydatek dla " + seller.getName() + ": " + seller.getIncome());
+                    System.out.println("Wydatek dla " + seller.getName() + ": " + seller.getCommision()*product.getPrice()*quantity/100);
                     wydatki_za_produkty_higieny+= wydadki_za_produkty_higieny_na_osobe*liczba_osob_w_centrum;
                     godziny--;
                     wydatki_zaswiatwo+=wydatki_zaswiatwo_za_godzine;
                 }liczba_dni--;
             }liczbaTydzien--;
+            int countOfPurchases = system.getPurchaseHistory().getAll().size();
+            for(int i=0; i<countOfPurchases; i++) {
+                PurchaseRecord purchaseRecord = system.getPurchaseHistory().getAll().get(i);
+                System.out.println("Name: " + purchaseRecord.getName() + ", quantity: " + purchaseRecord.getQuantity());
+            }
+            System.out.println();
         }
 
 
