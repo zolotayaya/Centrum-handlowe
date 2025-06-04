@@ -1,6 +1,6 @@
 package org.example;
 
-public class Product {
+public class Product extends AProduct{
     private int id;
     private String model;
     private float price;
@@ -16,13 +16,18 @@ public class Product {
         this.brand=brand;
         if (brand!=null){
             brand.addProduct(this);
-            System.out.println("This product was added to the Brand");
         }
     }
 
     public String getDetails() {
         return "Model: " + model + ", Price: " + price + ", Quantity: " + quantity + ", Description: " + description;
     }
+
+    @Override
+    public void displayInfo() {
+
+    }
+
     public float calculateFinalPrice(int quantity_sold ){
         return price*quantity_sold;
     }
@@ -38,10 +43,12 @@ public class Product {
         }
 
         this.quantity -= quantity_sold;
-        System.out.println("Sold " + quantity_sold + ". Available: " + this.quantity);
         return true;
     }
     public int getQuantity(){
         return quantity;
     }
+    public String getName() {return model;}
+    public Brand getBrand(){return brand;}
+    public float getPrice(){return price;}
 }

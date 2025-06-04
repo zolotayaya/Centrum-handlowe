@@ -1,84 +1,113 @@
 package org.example;
 
-import javax.xml.transform.Result;
-import java.sql.*;
-import java.util.*;
+import java.sql.SQLException;
 
-public class Seller extends Empoyee {
-    private int id;
-    private String name;
-    private String department;
-    private float income;
-    private float experience;
-    private int salescount = 0;
-    private float percent_income;
+public class Seller extends Employee implements IPromotable {
+    private int salesCount;
     private Brand brand;
     private float rating;
-    public void setExperience(int min, int max) throws SQLException {
-        Random rand = new Random();
-        List<String> names = new ArrayList<String>();
-        Database db = new Database();
-        Connection conn = db.getConnection();
-        String sql1 = "SELECT name FROM sellers";
-        PreparedStatement ps1 = conn.prepareStatement(sql1);
-        ResultSet rs = ps1.executeQuery();
-        while (rs.next()) {
-            names.add(rs.getString("name"));
-        }
-        String sql2 = "UPDATE sellers SET experience = ? WHERE name = ?";
-        PreparedStatement ps2 = conn.prepareStatement(sql2);
-        for (String name : names) {
-            int experience = min + rand.nextInt(max - min + 1);
-            ps2.setInt(1, experience);
-            ps2.setString(2, name);
-            ps2.executeUpdate();
-        }
-    }
-    public void saleProduct(Product product, int id) throws SQLException {
-        salescount++;
-        income += product.getPrice()/100*(int) percent_income;
-        Database db = new Database();
-        Connection conn = db.getConnection();
-        String sql1 = "UPDATE sellers SET count_of_sales=? WHERE unik_id = ?";
-        PreparedStatement ps = conn.prepareStatement(sql1);
-        ps.setInt(1, salescount);
-        ps.setInt(2, id);
-        ps.executeUpdate();
-    }
-    public void addToPromotionQueue(){
+    private Manager promotedTo;
 
+
+    public void addToPromotionQueue() {
     }
-    public float getAvarageRating(){
+
+    public float getAvarageRating() {
         return 0;
     }
 
-    public void createSellers(int seler) throws SQLException {
-        Database db = new Database();
-        Connection conn = db.getConnection();
-            String sql = "SELECT * FROM sellers WHERE unik_id= ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, seler);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                this.id = rs.getInt("unik_id");
-                this.name = rs.getString("name");
-                this.salescount = rs.getInt("count_of_sales");
-                this.department = rs.getString("department_id");
-                this.percent_income = rs.getFloat("percent_income");
-                this.experience = rs.getFloat("experience");
-            }
-    }
-    @Override
-    public String showInformation(){
-        return this.name;
-    }
-        public void showinformation(){
-            System.out.println("ID: " + id);
-            System.out.println("Name: " + name);
-            System.out.println("Department: " + department);
-            System.out.println("Income: " + income);
-            System.out.println("Experience: " + experience);
-            System.out.println("Sales count: " + salescount);
+    public Seller(int id, String name, Department department, float income, float commision, int salesCount, float rating, int experience) {
+        super(id, name, department, income, commision, experience);
+        this.salesCount = salesCount;
+        this.rating = rating;
+        if(department!=null){
+            department.addEmployee(this);
         }
+    }
+
+    public void saleProduct(Product product, int quantity) throws SQLException {
+        System.out.println("saleProduct called");
+      if (promotedTo != null) {
+            System.out.println("This seller has already been promoted and cannot sell anymore.");
+            return;
+        }
+        product.updateQuantity(quantity);
+        salesCount += 1;
+        this.income+=product.getPrice()*getCommision();
+//        if (checkPromotionCondition()) {
+//            executePromotion(); // автоматическое повышение
+//        }
+    }
+
+    @Override
+    public boolean checkPromotionCondition() {
+        System.out.println("checkPromotionCondition called");
+        Department department = this.getDepartment();
+        System.out.println("Department: " + department.getName());
+        if (department != null) {
+            System.out.println("Number of sellers in department: " + department.getSellers().size());
+        } else {
+            System.out.println("Department is null");
+            System.out.println(salesCount);
+        }
+        return salesCount >= 100 && department != null && department.getSellers().size() > 1;
+    }
+
+    @Override
+    public void executePromotion() {
+        System.out.println("executePromotion called");
+        System.out.println("Sales count: " + salesCount);
+        System.out.println("Promotion condition: " + checkPromotionCondition());
+        Department department = getDepartment();
+        if (department == null) return;
+        System.out.print("Error1");
+
+        if (brand != null) {
+            brand.setExpert(null); // Или метод для удаления эксперта
+            brand = null;
         }
 
+        // Zwalniamy menegera
+        Manager oldManager = department.getManager();
+        if (oldManager != null) {
+            department.fireManager();
+        }
+
+        // Tworzymy nowego menegera
+        Manager newManager = new Manager(getId(), getName(), department, getIncome(), getCommision(),getExperience());
+
+        department.removeEmployee(this); // удаляем продавца
+        department.addEmployee(newManager); // добавляем менеджера
+        this.promotedTo = newManager;
+
+        System.out.println(getName() + " Was promoted to manager!");
+
+    }
+
+    @Override
+    public String showInformation() {
+        return "Name: " + getName() + ", Department: " + getDepartment() + ", Income: " + getIncome() + ", Commision: " + getCommision() + ", Sales count: " + getsalesCount();
+    }
+
+    public void setBrand(Brand brand) {
+        if (this.brand != null) {
+            System.out.println("This seller is already assigned to the brand: " + this.brand.getName());
+        }
+        this.brand = brand;
+    }
+
+    public Brand getBrand() {
+        return brand;
+    }
+
+    public int getsalesCount() {
+        return  salesCount;
+    }
+    public Manager getPromotedTo() {
+        return promotedTo;
+    }
+    @Override
+    public float getIncome(){
+        return income;
+    }
+}
