@@ -1,22 +1,24 @@
 package org.example;
 
 public abstract class Employee {
-    private final int id;
+    private int id;
     private final String name;
     private final Department department;
-    private final float income;
+    protected float income;
     private final float commision;
+    private final int experience;
 
 
-    public Employee(int id,String name,Department department,float income,float commision){
+public Employee(int id,String name,Department department,float income,float commision, int experience){
         this.id=id;
         this.name=name;
         this.department=department;
         this.income=income;
         this.commision=commision;
-    }
-    //public abstract void calculate();
-    public abstract String showInformation();
+        this.experience = experience ;
+}
+//public abstract void calculate();
+public abstract String showInformation();
 
     public int getId() {
         return id;
@@ -36,5 +38,9 @@ public abstract class Employee {
 
     public float getCommision() {
         return commision;
+    }
+    public int getExperience() {return experience;}
+    public void setIncome(float income) {
+        this.income = income;
     }
 }
