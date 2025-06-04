@@ -70,7 +70,8 @@ public class Database {
         }
     }
 
-    public void setSellersFromDB() throws SQLException {
+    public void setSellersFromDB(int min,int max) throws SQLException {
+        Random rand = new Random();
         String sql = "SELECT * FROM Seler";
         PreparedStatement st = conection.prepareStatement(sql);
         ResultSet rs = st.executeQuery();
@@ -82,7 +83,8 @@ public class Database {
             float commision = rs.getFloat("commission");
             int salesCount = rs.getInt("salesCount");
             float rating = rs.getFloat("rating");
-            int experience = rs.getInt("experience_years");
+            int experience = min + rand.nextInt(max - min);
+//            int experience = rs.getInt("experience_years");
             for (Department dep : department) {
                 if (departmentname.equals(dep.getName())) {
                     sellers.add(new Seller(id, name, dep, income, commision, salesCount, rating, experience));

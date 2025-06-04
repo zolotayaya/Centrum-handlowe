@@ -1,6 +1,7 @@
 package org.example;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class SaleSystem {
     private PurchaseHistory purchaseHistory;
@@ -15,10 +16,13 @@ public class SaleSystem {
             }
             seller.saleProduct(product, quantity);
 
-            PurchaseRecord record = new PurchaseRecord(product, seller, buyerID);
+            PurchaseRecord record = new PurchaseRecord(product, seller,quantity, buyerID);
             purchaseHistory.addPurchase(record);  // Связь с PurchaseHistory
-            System.out.println("The sale ended succsesful!");
+//            System.out.println("The sale ended succsesful!");
             return record;
+        }
+        public PurchaseHistory getPurchaseHistory() {
+        return purchaseHistory;
         }
     }
 

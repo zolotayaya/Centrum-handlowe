@@ -26,7 +26,7 @@ public class Seller extends Employee implements IPromotable {
     }
 
     public void saleProduct(Product product, int quantity) throws SQLException {
-        System.out.println("saleProduct called");
+//        System.out.println("saleProduct called");
       if (promotedTo != null) {
             System.out.println("This seller has already been promoted and cannot sell anymore.");
             return;
