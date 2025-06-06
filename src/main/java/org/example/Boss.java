@@ -1,6 +1,9 @@
 package org.example;
 import java.util.*;
-public class Boss {
+public class Boss{
+    private int id;
+    private String name;
+    private float income;
     private List<Employee> allEmployees;
     private List<Department> allDepartment;
     public String makeReport(){
@@ -9,7 +12,7 @@ public class Boss {
     public float calculateCenterIncome(){
         return 0;
     }
-    public Boss(){
+    public Boss() {
         this.allEmployees=new ArrayList<>();
         this.allDepartment=new ArrayList<>();
     }
@@ -26,5 +29,14 @@ public class Boss {
                 addDepartment(employee.getDepartment());
             }
         }
+    }
+
+
+
+    public float getIncome() {
+        return income;
+    }
+    public void updateIncome(float income) {
+        this.income += income;
     }
 }

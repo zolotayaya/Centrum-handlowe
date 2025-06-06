@@ -14,7 +14,7 @@ public class PurchaseRecord {
         this.buyerID = buyerID;
         this.quantity = quantity;
     }
-    public String getName() {
+    public String getProductName() {
         String name = product.getName();
         return name;
     }

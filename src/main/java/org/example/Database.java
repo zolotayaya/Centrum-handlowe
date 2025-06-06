@@ -15,8 +15,8 @@ public class Database {
     private static Database instance;
 
     public Database() {
-        connection();  // викликаємо підключення один раз при створенні об’єкта
-        // ініціалізація списків
+        connection();  // połączenie wywołujemy raz podczas tworzenia obiektu
+        // inicjalizacja list
         sellers = new ArrayList<>();
         managers = new ArrayList<>();
         brands = new ArrayList<>();
@@ -26,7 +26,7 @@ public class Database {
     }
 
     public static Database getInstance() { //Singleton
-        if (instance == null) {
+        if(instance == null) {
             instance = new Database();
         }
         return instance;
@@ -44,6 +44,7 @@ public class Database {
             throw new RuntimeException(e);
         }
     }
+
 
     public void setDepartmentsFromDB() throws SQLException {
         String sql = "SELECT * FROM Department";
@@ -66,8 +67,18 @@ public class Database {
             float income = rs.getFloat("income");
             float commission = rs.getFloat("commission");
             int experience = rs.getInt("experience");
-            managers.add(new Manager(id, name, getDep(depname), income, commission, experience));
+            managers.add(new Manager(id, name,getDep(depname), income, commission, experience));
         }
+    }
+
+    public Department getDep(String depName) {
+        if (depName == null) return null;
+        for (Department dep : department) {
+            if (depName.trim().equalsIgnoreCase(dep.getName().trim())) {
+                return dep;
+            }
+        }
+        return null;
     }
 
     public void setSellersFromDB(int min,int max) throws SQLException {
@@ -78,18 +89,19 @@ public class Database {
         while (rs.next()) {
             int id = rs.getInt("id");
             String name = rs.getString("name");
-            String departmentname = rs.getString("department");
+            String depname = rs.getString("department");
             float income = rs.getFloat("salary");
             float commision = rs.getFloat("commission");
-            int salesCount = rs.getInt("salesCount");
+            int salesCount = rs.getInt("salescount");
             float rating = rs.getFloat("rating");
             int experience = min + rand.nextInt(max - min);
 //            int experience = rs.getInt("experience_years");
-            for (Department dep : department) {
-                if (departmentname.equals(dep.getName())) {
-                    sellers.add(new Seller(id, name, dep, income, commision, salesCount, rating, experience));
-                }
-            }
+            sellers.add(new Seller(id, name,getDep(depname),income, commision,experience, salesCount, rating));
+//            for (Department dep : department) {
+//                if (departmentname.equals(dep.getName())) {
+//                    sellers.add(new Seller(id, name, dep, income, commision, salesCount, rating, experience));
+//                }
+//            }
         }
     }
 
@@ -101,6 +113,7 @@ public class Database {
             String name = rs.getString("name");
             String depname = rs.getString("department");
             brands.add(new Brand(name, getDep(depname)));
+            System.out.println("Brand: " + name);
         }
     }
 
@@ -124,27 +137,6 @@ public class Database {
         }
     }
 
-
-    public Department getDep(String depName) {
-        if (depName == null) return null;
-        for (Department dep : department) {
-            if (depName.trim().equalsIgnoreCase(dep.getName().trim())) {
-                return dep;
-            }
-        }
-        return null;
-    }
-
-
-    public void updateQuantityInDB(Product product, int quantity) throws SQLException {
-        String sql = "UPDATE Product SET quantity = ? WHERE name = ?";
-        PreparedStatement st = conection.prepareStatement(sql);
-        st.setInt(1, quantity);
-        st.setString(2, product.getName());
-        st.executeUpdate();
-    }
-
-
     public Brand getBrand(String brandName) {
         if (brandName == null) return null;
         for (Brand brand : brands) {
@@ -155,6 +147,69 @@ public class Database {
         return null;
     }
 
+    public void setBossFromDB() throws SQLException {
+        String sql = "SELECT * FROM Boss";
+        PreparedStatement st = conection.prepareStatement(sql);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            int id = rs.getInt("unik_id");
+            String name = rs.getString("name");
+            float income = rs.getFloat("income");
+            boss = new Boss();
+        }
+    }
+
+    public void updateQuantityInDB(Product product, int quantity) throws SQLException {
+        String sql = "UPDATE Product SET quantity = ? WHERE name = ?";
+        PreparedStatement st = conection.prepareStatement(sql);
+        st.setInt(1, quantity);
+        st.setString(2, product.getName());
+        st.executeUpdate();
+    }
+
+    public void updateDataBase(Product product, Seller seller, Manager manager) throws SQLException {
+        String sql = "UPDATE Product SET quantity = ? WHERE name = ?";
+        PreparedStatement st = conection.prepareStatement(sql);
+        st.setInt(1, product.getQuantity());
+        st.setString(2, product.getName());
+        st.executeUpdate();
+
+        String sql1 = "UPDATE Seler SET salescount = ?, salary = ? WHERE name = ?";
+        PreparedStatement st1 = conection.prepareStatement(sql1);
+        st1.setInt(1,seller.getsalesCount());
+        st1.setFloat(2,seller.getIncome());
+        st1.setString(3, seller.getName());
+        st1.executeUpdate();
+
+        String sql2 = "UPDATE Manager SET income = ? WHERE name = ?";
+        PreparedStatement st2 = conection.prepareStatement(sql2);
+        st2.setFloat(1, manager.getIncome());
+        st2.setString(2, manager.getName());
+        st2.executeUpdate();
+
+        String sql3 = "UPDATE Boss SET income = ?";
+        PreparedStatement st3 = conection.prepareStatement(sql3);
+        st3.setFloat(1,     product.getPrice() - (product.getPrice()/100*seller.getCommision() + product.getPrice()/100*manager.getCommision()));
+        st3.executeUpdate();
+    }
+
+    public void cleanDB() throws SQLException {
+        String sql = "UPDATE Boss SET income = 0";
+        PreparedStatement st = conection.prepareStatement(sql);
+        st.executeUpdate();
+
+        String sql1 = "UPDATE Manager SET income = 0";
+        PreparedStatement st1 = conection.prepareStatement(sql1);
+        st1.executeUpdate();
+
+        String sql2 = "UPDATE Seler SET salary = 0, salescount = 0";
+        PreparedStatement st2 = conection.prepareStatement(sql2);
+        st2.executeUpdate();
+
+        String sql3 = "UPDATE Product SET quantity = 1000";
+        PreparedStatement st3 = conection.prepareStatement(sql3);
+        st3.executeUpdate();
+    }
 
     public List<Department> getDepartments() {
         return department;
@@ -162,18 +217,6 @@ public class Database {
 
     public List<Seller> getSellers() {
         return sellers;
-    }
-
-    public void setExperience(int min, int max) throws SQLException {
-        Random rand = new Random();
-        String sql = "UPDATE Seler SET experience_years = ? WHERE name = ?";
-        PreparedStatement ps = conection.prepareStatement(sql);
-        for (Seller seller : sellers) {
-            int experience = min + rand.nextInt(max - min + 1);
-            ps.setInt(1, experience);
-            ps.setString(2, seller.getName());
-            ps.executeUpdate();
-        }
     }
 
     public List<Manager> getManagers() {
@@ -188,9 +231,10 @@ public class Database {
         return products;
     }
 
-    public Connection getConnection(){
-        return conection;
-    }
+//    public Connection getConnection(){
+//        return conection;
+//    }
+
     public  Database getDatabase(){
         return this;
     }
