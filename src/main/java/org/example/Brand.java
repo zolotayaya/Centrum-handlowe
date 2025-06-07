@@ -18,7 +18,6 @@ public class Brand {
 
     public void setExpert(Seller expert) {
         this.experts.add(expert);
-
     }
 
 //        System.out.println("Expert is set");

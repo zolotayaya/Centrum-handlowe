@@ -16,12 +16,12 @@ public class Seller extends Employee implements IPromotable {
         return 0;
     }
 
-    public Seller(int id, String name, Department department, float income, float commision, int salesCount, float rating, int experience) {
+    public Seller(int id, String name, Department department, float income, float commision, int experience, int salesCount, float rating) {
         super(id, name, department, income, commision, experience);
         this.salesCount = salesCount;
         this.rating = rating;
         if(department!=null){
-            department.addEmployee(this);
+            getDepartment().addEmployee(this);
         }
     }
 
@@ -33,7 +33,7 @@ public class Seller extends Employee implements IPromotable {
         }
         product.updateQuantity(quantity);
         salesCount += 1;
-        this.income+=product.getPrice()*getCommision();
+        this.income+=product.getPrice()*getCommision()/100;
 //        if (checkPromotionCondition()) {
 //            executePromotion(); // автоматическое повышение
 //        }
@@ -74,7 +74,7 @@ public class Seller extends Employee implements IPromotable {
         }
 
         // Tworzymy nowego menegera
-        Manager newManager = new Manager(getId(), getName(), department, getIncome(), getCommision(),getExperience());
+        Manager newManager = new Manager(getId(),getName(),getDepartment(), getIncome(), getCommision(),getExperience());
 
         department.removeEmployee(this); // удаляем продавца
         department.addEmployee(newManager); // добавляем менеджера
@@ -100,14 +100,15 @@ public class Seller extends Employee implements IPromotable {
         return brand;
     }
 
+
     public int getsalesCount() {
         return  salesCount;
     }
     public Manager getPromotedTo() {
         return promotedTo;
     }
-    @Override
-    public float getIncome(){
-        return income;
-    }
+//    @Override
+//    public float getIncome(){
+//        return income;
+//    }
 }

@@ -4,13 +4,13 @@ public class Manager extends Employee {
     private List<Seller> ManagedSellers;
 
 
-    public Manager(int id,String name,Department department,float income,float commision, int experience){
-        super(id, name, department, income, commision, experience);
-        if (department.getManager() != null) {
-            System.out.println("This department already has a manager: " + department.getManager().getName());
+    public Manager(int id,String name, Department department, float income,float commision, int experience) {
+        super(id, name, department,income, commision, experience);
+        if (this.getDepartment().getManager() != null) {
+            System.out.println("This department already has a manager: " + this.getDepartment().getManager().getName());
         }else {
             this.ManagedSellers = new ArrayList<>();
-            department.setManager(this);
+            this.getDepartment().setManager(this);
         }
     }
     public List<Seller> getSeller(){
@@ -29,6 +29,10 @@ public class Manager extends Employee {
     @Override
     public String toString() {
         return "Manager{name='" + getName() + "', id=" + getId() + "}";
+    }
+
+    public void updateIncome(Product product) {
+        this.income += product.getPrice()*getCommision()/100;
     }
 
 }
