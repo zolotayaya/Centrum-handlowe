@@ -1,4 +1,5 @@
-package org.example;
+package org.example.model;
+
 import java.util.*;
 public class Department {
     private String name;
