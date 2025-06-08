@@ -153,20 +153,15 @@ public class ShoppingCenter {
 
     private void initializeDatabase() throws SQLException {
         printStatus("Initializing database...");
-        System.out.println("Hello");
+        db.cleanDB();
+        db.initializationDB();
+        System.out.println("Initialized allready database");
         department.setDepartmentsFromDB();
-        System.out.println("Hello");
         manager.setManagersFromDB();
-        System.out.println("Hello");
         seller.setSellersFromDB();
-        System.out.println("Hello");
         brand.setBrandFromDB();
-        System.out.println("Hello");
         boss.setBossFromDB();
-        System.out.println("Hello");
         product.setProductsFromDB();
-        System.out.println("Hello");
-
         printSuccess("The database is ready for use.");
         pause();
     }

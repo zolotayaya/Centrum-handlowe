@@ -31,7 +31,7 @@ public class BossDB {
     public void setBossFromDB() throws SQLException {
         if (instance == null) {
             try{
-                 PreparedStatement stmt = connection.prepareStatement("SELECT name, income FROM boss WHERE id = 1");
+                 PreparedStatement stmt = connection.prepareStatement("SELECT name, income FROM Boss WHERE id = 1");
                  ResultSet rs = stmt.executeQuery(
 
                  );

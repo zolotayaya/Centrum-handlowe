@@ -23,7 +23,7 @@ public class SellerDB {
 
     public void setSellersFromDB() throws SQLException {
         Random rand = new Random();
-        String sql = "SELECT * FROM Seler";
+        String sql = "SELECT * FROM Sellers";
         PreparedStatement st = connection.prepareStatement(sql);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

@@ -22,7 +22,7 @@ public class ProductDB {
     public void setProductsFromDB() throws SQLException {
         System.out.println("Vasil");
 
-        String sql = "SELECT * FROM Product";
+        String sql = "SELECT * FROM Products";
         PreparedStatement st = connection.prepareStatement(sql);
         System.out.println("Makar");
 
