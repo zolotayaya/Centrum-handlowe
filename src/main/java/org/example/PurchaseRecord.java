@@ -1,5 +1,8 @@
 package org.example;
 
+import org.example.model.Product;
+import org.example.model.Seller;
+
 public class PurchaseRecord {
     private Product product;
     private Seller seller;

@@ -1,4 +1,5 @@
-package org.example;
+package org.example.model;
+
 import java.util.*;
 public class Brand {
     private int id;
@@ -18,6 +19,7 @@ public class Brand {
 
     public void setExpert(Seller expert) {
         this.experts.add(expert);
+        System.out.println("Expert added: " + expert.getName());
     }
 
 //        System.out.println("Expert is set");

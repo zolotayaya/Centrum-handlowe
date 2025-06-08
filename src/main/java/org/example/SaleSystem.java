@@ -1,7 +1,9 @@
 package org.example;
 
+import org.example.model.Product;
+import org.example.model.Seller;
+
 import java.sql.SQLException;
-import java.util.List;
 
 public class SaleSystem {
     private PurchaseHistory purchaseHistory;
@@ -15,8 +17,8 @@ public class SaleSystem {
                 return null;
             }
             seller.saleProduct(product, quantity);
-//            System.out.println("Seller ");
-            product.getBrand().getDepartment().getManager().updateIncome(product);
+            System.out.println("Seller ");
+//            product.getBrand().getDepartment().getManager().updateIncome(product);
 
             PurchaseRecord record = new PurchaseRecord(product, seller,quantity, buyerID);
             purchaseHistory.addPurchase(record);  // Zwiazek z PurchaseHistory
