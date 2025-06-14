@@ -16,7 +16,6 @@ public class Product {
         this.brand=brand;
         if (brand!=null){
             brand.addProduct(this);
-            System.out.println("This product was added to the Brand");
         }
     }
 

@@ -21,27 +21,7 @@ public class Boss{
         this.allEmployees = new ArrayList<>();
         this.allDepartment = new ArrayList<>();
     }
-//    public static Boss getInstance() {
-//        if (instance == null) {
-//            try{
-//                 PreparedStatement stmt = conn.prepareStatement("SELECT name, income FROM boss WHERE id = 1");
-//                 ResultSet rs = stmt.executeQuery()) {
-//
-//                if (rs.next()) {
-//                    String name = rs.getString("name");
-//                    float income = rs.getFloat("income");
-//                    instance = new Boss(name, income);
-//                } else {
-//                    instance = new Boss("Default Boss", 0);
-//
-//                }
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//                instance = new Boss("Default Boss", 0);
-//            }
-//        }
-//        return instance;
-//    }
+
     public void addDepartment(Department department) {
         if (!allDepartment.contains(department)) {
             allDepartment.add(department);

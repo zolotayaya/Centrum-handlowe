@@ -21,7 +21,7 @@ public class ManagerDB {
     }
 
     public void setManagersFromDB() throws SQLException {
-        String sql = "SELECT * FROM Manager";
+        String sql = "SELECT * FROM Managers";
         PreparedStatement st = connection.prepareStatement(sql);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

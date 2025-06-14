@@ -1,7 +1,4 @@
-package org.example;
-
-import org.example.model.Product;
-import org.example.model.Seller;
+package org.example.model;
 
 import java.sql.SQLException;
 
@@ -17,12 +14,11 @@ public class SaleSystem {
                 return null;
             }
             seller.saleProduct(product, quantity);
-            System.out.println("Seller ");
-//            product.getBrand().getDepartment().getManager().updateIncome(product);
-
             PurchaseRecord record = new PurchaseRecord(product, seller,quantity, buyerID);
+            System.out.println("Purchase recor added");
             purchaseHistory.addPurchase(record);  // Zwiazek z PurchaseHistory
-//            System.out.println("The sale ended succsesful!");
+            System.out.println("Purchase hisstory updated");
+            System.out.println("The sale ended succsesful!");
             return record;
         }
         public PurchaseHistory getPurchaseHistory() {

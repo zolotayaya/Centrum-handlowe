@@ -19,7 +19,7 @@ public class BrandDB {
         this.connection = Database.getConnection();
     }
     public void setBrandFromDB() throws SQLException {
-        String sql = "SELECT * FROM Brand";
+        String sql = "SELECT * FROM Brands";
         PreparedStatement st = connection.prepareStatement(sql);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

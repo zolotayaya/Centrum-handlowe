@@ -19,29 +19,27 @@ public class ProductDB {
         products = new ArrayList<Product>();
         connection = Database.getConnection();
 }
-    public void setProductsFromDB() throws SQLException {
-        System.out.println("Vasil");
-
-        String sql = "SELECT * FROM Product";
-        PreparedStatement st = connection.prepareStatement(sql);
-        System.out.println("Makar");
-
-        ResultSet rs = st.executeQuery();
-        while (rs.next()) {
-            String name = rs.getString("name");
-            float price = rs.getFloat("price");
-            int quantity = rs.getInt("quantity");
-            String description = rs.getString("description");
-            String brand = rs.getString("brand");
-            Brand brand1 = getBrand(brand);
-            if (brand1 == null) {
-                System.out.println("❌ Brand nie znaleziono: " + brand);
-                continue; // albo throw new RuntimeException()
+    public void setProductsFromDB(BrandDB brandDB) throws SQLException {
+        String sql = "SELECT * FROM Products";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("name");
+                float price = rs.getFloat("price");
+                int quantity = rs.getInt("quantity");
+                String description = rs.getString("description");
+                String brand = rs.getString("brand");
+                Brand brand1 = getBrand(brand, brandDB);
+                if (brand1 == null) {
+                    System.out.println("❌ Brand nie znaleziono: " + brand);
+                    continue; // albo throw new RuntimeException()
+                }
+                products.add(new Product(name, price, quantity, description, getBrand(brand, brandDB)));
             }
-
-            products.add(new Product(name, price, quantity, description, getBrand(brand)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        System.out.println("Added");
     }
 
     public Department getDep(String depName) {
@@ -55,8 +53,8 @@ public class ProductDB {
         return null;
     }
 
-    public Brand getBrand(String brandName) {
-        List<Brand> brands = BrandDB.getBrands();
+    public Brand getBrand(String brandName, BrandDB brandDB) {
+        List<Brand> brands = brandDB.getBrands();
         if (brandName == null) return null;
         for (Brand brand : brands) {
             if (brandName.trim().equalsIgnoreCase(brand.getName().trim())) {
@@ -67,11 +65,12 @@ public class ProductDB {
     }
 
     public void updateQuantityInDB(Product product, int quantity) throws SQLException {
-        String sql = "UPDATE Product SET quantity = ? WHERE name = ?";
+        String sql = "UPDATE Products SET quantity = ? WHERE name = ?";
         PreparedStatement st = connection.prepareStatement(sql);
         st.setInt(1, quantity);
         st.setString(2, product.getName());
         st.executeUpdate();
+        System.out.println("Quantity updated in DB: " + quantity);
     }
 
     public List<Product> getProducts() {

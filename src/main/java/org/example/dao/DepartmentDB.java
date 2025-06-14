@@ -18,7 +18,7 @@ public class DepartmentDB {
         this.connection = Database.getConnection();
     }
     public void setDepartmentsFromDB() throws SQLException {
-        String sql = "SELECT * FROM Department";
+        String sql = "SELECT * FROM Departments";
         PreparedStatement st = connection.prepareStatement(sql);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

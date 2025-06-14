@@ -6,7 +6,6 @@ import java.util.Scanner;
 
 import static java.awt.Color.RED;
 import static java.awt.Font.BOLD;
-import static jdk.javadoc.internal.doclets.formats.html.markup.HtmlAttr.InputType.RESET;
 
 public abstract class Window {
     private static final String RESET = "\u001B[0m";
@@ -84,3 +83,4 @@ public abstract class Window {
         System.out.println("│" + RESET);
         }
 }
+//"│"

@@ -1,4 +1,4 @@
-package org.example;
+package org.example.model;
 
 import org.example.dao.ReviewDB;
 import org.example.database.Database;
@@ -62,7 +62,7 @@ ReviewDB reviewDB = new ReviewDB();
 
     public static List<Review> getReviewsByProductId(int productId) throws SQLException {
         List<Review> reviews = new ArrayList<>();
-        String sql = "SELECT * FROM reviews WHERE product_id = ? ORDER BY created_at DESC";
+        String sql = "SELECT * FROM Reviews WHERE product_id = ? ORDER BY created_at DESC";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

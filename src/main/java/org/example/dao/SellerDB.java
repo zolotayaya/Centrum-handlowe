@@ -23,7 +23,7 @@ public class SellerDB {
 
     public void setSellersFromDB() throws SQLException {
         Random rand = new Random();
-        String sql = "SELECT * FROM Seler";
+        String sql = "SELECT * FROM Sellers";
         PreparedStatement st = connection.prepareStatement(sql);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
@@ -34,7 +34,6 @@ public class SellerDB {
             float commision = rs.getFloat("commission");
             int salesCount = rs.getInt("salescount");
             float rating = rs.getFloat("rating");
-//            int experience = min + rand.nextInt(max - min);
             int experience = rs.getInt("experience_years");
             sellers.add(new Seller(id, name,getDep(depname),income, commision, salesCount,rating,experience));
         }
@@ -63,6 +62,9 @@ public class SellerDB {
 
     public List<Seller> getSellers() throws SQLException{
         return sellers;
+    }
+    public static void updateSeller(Seller seller) throws SQLException{
+        sellers.add(seller);
     }
 
 }
