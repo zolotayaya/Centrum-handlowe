@@ -1,11 +1,15 @@
-package org.example;
+package org.example.model;
+import org.example.dao.PurchaseHistoryDB;
+
+import java.sql.SQLException;
 import java.util.*;
 public class PurchaseHistory {
 
     private List<PurchaseRecord> purchases = new ArrayList<>();
-
-        public void addPurchase(PurchaseRecord record) {
+    private PurchaseHistoryDB purchaseHistoryDB = new PurchaseHistoryDB();
+        public void addPurchase(PurchaseRecord record) throws SQLException {
             purchases.add(record);
+            purchaseHistoryDB.updateHistory(record);
         }
 
         public void displayHistory() {
@@ -18,5 +22,4 @@ public class PurchaseHistory {
             return purchases;
         }
     }
-
 

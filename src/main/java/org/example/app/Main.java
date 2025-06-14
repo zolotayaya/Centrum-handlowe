@@ -1,13 +1,4 @@
 package org.example.app;
-import org.example.PurchaseRecord;
-import org.example.SaleSystem;
-import org.example.database.Database;
-import org.example.model.Brand;
-import org.example.model.Product;
-import org.example.model.Seller;
-
-import java.sql.SQLException;
-import java.util.*;
 
 //public class Main extends Database {
 //    public static void main(String args[]) throws SQLException {

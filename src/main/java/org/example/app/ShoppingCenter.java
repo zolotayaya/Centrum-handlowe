@@ -1,14 +1,17 @@
-package org.example;
-import org.example.app.Colors;
-import org.example.app.Customer;
-import org.example.app.Director;
+package org.example.app;
+
+import org.example.DataExporter;
+import org.example.model.HR_Service;
+import org.example.model.ReportingService;
+import org.example.model.SaleSystem;
 import org.example.dao.*;
 import org.example.database.Database;
-import org.example.model.*;
 
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.*;
-public class ShoppingCenter {
+public class ShoppingCenter extends Window{
     private Database db;
     private Scanner scanner;
     private SaleSystem saleSystem;
@@ -24,14 +27,14 @@ public class ShoppingCenter {
 
     // ANSI color codes for console output
 
-    private static final String RESET = "\u001B[0m";
-    private static final String RED = "\u001B[31m";
-    private static final String GREEN = "\u001B[32m";
-    private static final String YELLOW = "\u001B[33m";
-    private static final String BLUE = "\u001B[34m";
-    private static final String PURPLE = "\u001B[35m";
-    private static final String CYAN = "\u001B[36m";
-    private static final String BOLD = "\u001B[1m";
+//    private static final String RESET = "\u001B[0m";
+//    private static final String RED = "\u001B[31m";
+//    private static final String GREEN = "\u001B[32m";
+//    private static final String YELLOW = "\u001B[33m";
+//    private static final String BLUE = "\u001B[34m";
+//    private static final String PURPLE = "\u001B[35m";
+//    private static final String CYAN = "\u001B[36m";
+//    private static final String BOLD = "\u001B[1m";
 
     public ShoppingCenter() {
         db = Database.getInstance();
@@ -47,7 +50,7 @@ public class ShoppingCenter {
         product = new ProductDB();
     }
 
-    public void start() throws SQLException {
+    public void start() throws SQLException, UnsupportedEncodingException {
         initializeDatabase();
         selectUserRole();
     }
@@ -58,7 +61,8 @@ public class ShoppingCenter {
             printHeader("Shopping Center Management System");
             System.out.println(Colors.BOLD.get() + Colors.BLUE.get() + "1." + Colors.RESET.get() + " Enter as Customer");
             System.out.println(Colors.BOLD.get() + Colors.BLUE.get() + "2." + Colors.RESET.get() + " Enter as Director");
-            System.out.println(Colors.BOLD.get() + Colors.RED.get() + "3." + Colors.RESET.get() + " Exit System");
+            System.out.println(Colors.BOLD.get() + Colors.BLUE.get() + "3." + Colors.RESET.get() + " Get a job");
+            System.out.println(Colors.BOLD.get() + Colors.RED.get() + "4." + Colors.RESET.get() + " Exit System");
             System.out.print(Colors.BOLD.get() + "Select your role: " + Colors.RESET.get());
 
             int choice = getIntInput(1, 3);
@@ -71,7 +75,12 @@ public class ShoppingCenter {
                     Director.directorInterface(manager,seller,product,brand,saleSystem,reportingService,dataExporter);
                     break;
                 case 3:
-                    System.out.println(Colors.GREEN.get() + "Exiting system..." + RESET);
+                    if(HR_Service.takeQuizDepartment()){
+                        System.out.println(HR_Service.generateEmployeers(seller,department));
+                    }
+                    break;
+                case 4:
+                    System.out.println(Colors.GREEN.get() + "Exiting system..." + Colors.RESET.get());
                     return;
             }
         }
@@ -154,6 +163,7 @@ public class ShoppingCenter {
     private void initializeDatabase() throws SQLException {
         printStatus("Initializing database...");
         db.cleanDB();
+//        System.out.println("Deleted");
         db.initializationDB();
         System.out.println("Initialized allready database");
         department.setDepartmentsFromDB();
@@ -161,7 +171,7 @@ public class ShoppingCenter {
         seller.setSellersFromDB();
         brand.setBrandFromDB();
         boss.setBossFromDB();
-        product.setProductsFromDB();
+        product.setProductsFromDB(brand);
         printSuccess("The database is ready for use.");
         pause();
     }
@@ -412,31 +422,31 @@ public class ShoppingCenter {
 //    }
 //
 //
-    private void clearScreen() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
+//    private void clearScreen() {
+//        System.out.print("\033[H\033[2J");
+//        System.out.flush();
+//    }
 
-    private void printHeader(String text) {
-        System.out.println(BOLD + PURPLE + "=== " + text + " ===" + RESET);
-        System.out.println();
-    }
-//
+//    private void printHeader(String text) {
+//        System.out.println(Colors.BOLD.get() + Colors.PURPLE.get() + "=== " + text + " ===" + Colors.RESET.get());
+//        System.out.println();
+//    }
+
 //    private void printSubHeader(String text) {
 //        System.out.println(BOLD + CYAN + "◆ " + text + RESET);
 //    }
 //
-    private void printStatus(String text) {
-        System.out.println(BLUE + "➤ " + text + RESET);
-    }
-
-    private void printSuccess(String text) {
-        System.out.println(GREEN + "✓ " + text + RESET);
-    }
-
-    private void printError(String text) {
-        System.out.println(RED + "✗ " + text + RESET);
-    }
+//    private void printStatus(String text) {
+//        System.out.println(Colors.BLUE.get() + "➤ " + text + Colors.RESET.get());
+//    }
+////
+//    private void printSuccess(String text) {
+//        System.out.println(Colors.GREEN.get() + "✓ " + text + Colors.RESET.get());
+//    }
+//
+//    private void printError(String text) {
+//        System.out.println(RED + "✗ " + text + RESET);
+//    }
 //
 //    private void printTableHeader(String[] columns) {
 //        System.out.print(BOLD + BLUE);
@@ -461,34 +471,34 @@ public class ShoppingCenter {
 //        return str.substring(0, maxLength-3) + "...";
 //    }
 //
-    private void pause() {
-        System.out.println();
-        System.out.print(BOLD + "Press Enter to continue..." + RESET);
-        scanner.nextLine();
-    }
+//    private void pause() {
+//        System.out.println();
+//        System.out.print(Colors.BOLD.get() + "Press Enter to continue..." + Colors.RESET.get());
+//        scanner.nextLine();
+//    }
+//
+//    private int getIntInput(int min, int max) {
+//        while (true) {
+//            try {
+//                int input = scanner.nextInt();
+//                scanner.nextLine();
+//                if (input >= min && input <= max) {
+//                    return input;
+//                }
+//                System.out.println(Colors.RED.get() + "Please enter a number from " + min + " to " + max + Colors.RESET.get());
+//            } catch (Exception e) {
+//                scanner.nextLine();
+//                System.out.println(Colors.RED.get() + "Invalid input. Please enter an integer.." + Colors.RESET.get());
+//            }
+//}
 
-    private int getIntInput(int min, int max) {
-        while (true) {
-            try {
-                int input = scanner.nextInt();
-                scanner.nextLine();
-                if (input >= min && input <= max) {
-                    return input;
-                }
-                System.out.println(RED + "Please enter a number from " + min + " to " + max + RESET);
-            } catch (Exception e) {
-                scanner.nextLine();
-                System.out.println(RED + "Invalid input. Please enter an integer.." + RESET);
-            }
-        }
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        System.setOut(new PrintStream(System.out, true, "UTF-8"));
         try {
             ShoppingCenter app = new ShoppingCenter();
             app.start();
-        } catch (SQLException e) {
-            System.out.println(RED + "Database Error: " + e.getMessage() + RESET);
+        } catch (SQLException | UnsupportedEncodingException e) {
+            System.out.println(Colors.RED.get() + "Database Error: " + e.getMessage() + Colors.RESET.get());
         }
     }
 }

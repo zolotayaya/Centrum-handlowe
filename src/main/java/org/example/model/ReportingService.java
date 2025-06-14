@@ -1,6 +1,7 @@
-package org.example;
+package org.example.model;
 import org.example.database.Database;
 
+import javax.swing.*;
 import java.util.*;
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -8,17 +9,16 @@ public class ReportingService {
     public List<Map<String, Object>> employeeReportWithPosition() throws SQLException {
         List<Map<String, Object>> report = new ArrayList<>();
         String sql = "SELECT s.department, " +
-                "CASE WHEN m.id IS NOT NULL THEN 'Manager' ELSE 'Seller' END AS position, " +
+                "CASE WHEN m.id IS NOT NULL THEN 'Managers' ELSE 'Sellers' END AS position, " +
                 "COUNT(*) AS employee_count " +
-                "FROM Seller s " +
-                "LEFT JOIN Manager m ON s.id = m.id " +
+                "FROM Sellers s " +
+                "LEFT JOIN Managers m ON s.id = m.id " +
                 "GROUP BY s.department, position " +
                 "ORDER BY s.department, position";
 
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        Connection conn = Database.getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
                 Map<String, Object> row = new LinkedHashMap<>();
                 row.put("department", rs.getString("department"));
@@ -26,6 +26,9 @@ public class ReportingService {
                 row.put("employee_count", rs.getInt("employee_count"));
                 report.add(row);
             }
+            }catch (SQLException e) {
+            System.err.println("Error with connection: " + e.getMessage());
+            e.printStackTrace();
         }
         return report;
     }
@@ -34,10 +37,11 @@ public class ReportingService {
         List<Map<String, Object>> report = new ArrayList<>();
 
         String bossSql = "SELECT name, income FROM Boss";
-        String managerSql = "SELECT name, income FROM Manager";
-        String totalIncomeSql = "SELECT SUM(income) AS total_income FROM Manager";
+        String managerSql = "SELECT name, income FROM Managers";
+        String totalIncomeSql = "SELECT SUM(income) AS total_income FROM Managers";
 
-        try (Connection conn = Database.getConnection()) {
+        try {
+            Connection conn = Database.getConnection();
             try (Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(bossSql)) {
                 if (rs.next()) {
@@ -69,18 +73,19 @@ public class ReportingService {
                     report.add(totalIncomeData);
                 }
             }
+        } catch (SQLException e) {
+            System.err.println("Error with connection: " + e.getMessage());
+            e.printStackTrace();
         }
         return report;
     }
 
     public List<Map<String, Object>> generateProductReport() throws SQLException {
         List<Map<String, Object>> report = new ArrayList<>();
-        String sql = "SELECT COUNT(*) AS total_products, AVG(price) AS avg_price, SUM(quantity) AS total_quantity FROM Product";
-
-        try (Connection conn = Database.getConnection();
-             Statement stmt = conn.createStatement();
+        String sql = "SELECT COUNT(*) AS total_products, AVG(price) AS avg_price, SUM(quantity) AS total_quantity FROM Products";
+        Connection conn = Database.getConnection();
+        try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
-
             if (rs.next()) {
                 Map<String, Object> productData = new LinkedHashMap<>();
                 productData.put("total_products", rs.getInt("total_products"));
@@ -101,9 +106,8 @@ public class ReportingService {
                 "WHERE ph.purchase_date BETWEEN ? AND ? " +
                 "GROUP BY s.department, ph.product_name " +
                 "ORDER BY s.department, total_sales DESC";
-
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = Database.getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setTimestamp(1, Timestamp.valueOf(from));
             stmt.setTimestamp(2, Timestamp.valueOf(to));

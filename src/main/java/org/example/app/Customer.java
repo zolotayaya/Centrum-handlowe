@@ -1,6 +1,6 @@
 package org.example.app;
 
-import org.example.Review;
+import org.example.model.Review;
 import org.example.dao.ProductDB;
 import org.example.model.Product;
 

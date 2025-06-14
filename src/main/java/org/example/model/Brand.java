@@ -19,7 +19,6 @@ public class Brand {
 
     public void setExpert(Seller expert) {
         this.experts.add(expert);
-        System.out.println("Expert added: " + expert.getName());
     }
 
 //        System.out.println("Expert is set");
@@ -59,6 +58,7 @@ public class Brand {
     }
 
     public List<Seller> getExperts() {
+        System.out.println("Size" + experts.size());
         return experts;
     }
 }

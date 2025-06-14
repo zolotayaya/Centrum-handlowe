@@ -1,6 +1,6 @@
 package org.example.database;
 import org.example.model.Department;
-import org.example.PurchaseRecord;
+import org.example.model.PurchaseRecord;
 import org.example.model.*;
 
 import java.sql.*;
@@ -29,28 +29,29 @@ public class Database {
         sales = new ArrayList<>();
     }
 
-    public static Database getInstance() { //Singleton
-        if(instance == null) {
-            instance = new Database();
+        public static Database getInstance() { //Singleton
+            if(instance == null) {
+                instance = new Database();
+            }
+            return instance;
         }
-        return instance;
-    }
 
-    public void connection() {
+    public  void connection() {
         String url = "jdbc:postgresql://localhost:5432/postgres";
         String user = "postgres";
         String password = "datax";
         try {
             Class.forName("org.postgresql.Driver");
             this.conection = DriverManager.getConnection(url, user, password);
-            System.out.println("Connection sequscees");
+            System.out.println("The connection is successful");
         } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
  public void initializationDB() throws SQLException {
         String sql_create_Sellers = "CREATE TABLE Sellers (\n" +
-                "    id INT PRIMARY KEY,\n" +
+                "    id INT GENERATED ALWAYS AS IDENTITY \n" +
+                "        (MINVALUE 1 MAXVALUE 999 START WITH 1) PRIMARY KEY,\n" +
                 "    name VARCHAR(100) NOT NULL,\n" +
                 "    department VARCHAR(50) NOT NULL,\n" +
                 "    salary INT DEFAULT 0,\n" +
@@ -59,10 +60,12 @@ public class Database {
                 "    commission INT,\n" +
                 "    salescount INT DEFAULT 0\n" +
                 ")";
+
         String sql_create_Departments = "CREATE TABLE Departments (\n" +
                 "    id INT PRIMARY KEY,\n" +
                 "    name VARCHAR(50) NOT NULL\n" +
                 ");\n";
+
         String sql_create_Products = "CREATE TABLE Products (\n" +
                 "    id INT PRIMARY KEY,\n" +
                 "    name VARCHAR(100) NOT NULL,\n" +
@@ -73,7 +76,8 @@ public class Database {
                 ");\n";
 
         String sql_create_Managers = "CREATE TABLE Managers (\n" +
-                "    id INT PRIMARY KEY,\n" +
+                "   id INT GENERATED ALWAYS AS IDENTITY \n" +
+                "        (MINVALUE 1000 MAXVALUE 1999 START WITH 1000) PRIMARY KEY,\n" +
                 "    name VARCHAR(50) NOT NULL,\n" +
                 "    department VARCHAR(50) NOT NULL,\n" +
                 "    income DECIMAL(10, 2) DEFAULT 0.00,\n" +
@@ -88,7 +92,7 @@ public class Database {
                 ");";
 
         String sql_create_Boss = "CREATE TABLE Boss (\n" +
-                "    id SERIAL PRIMARY KEY,\n" +
+                "    id INT PRIMARY KEY,\n" +
                 "    name VARCHAR(50) NOT NULL,\n" +
                 "    income DECIMAL(10, 2) DEFAULT 0.00\n" +
                 ");";
@@ -99,59 +103,107 @@ public class Database {
                 "rating DECIMAL(10, 1) DEFAULT 0.00\n" +
                 ");";
 
-        String sql_insert_Sellers  = "INSERT INTO Sellers (id, name, department, salary, experience_years, rating, commission, salescount)\n" +
+        String sql_create_Purchase_History = "CREATE TABLE Purchase_History (\n" +
+                "    id SERIAL PRIMARY KEY,\n" +
+                "    product_name VARCHAR(255) NOT NULL,\n" +
+                "    seller_name VARCHAR(255) NOT NULL,\n" +
+                "    buyer_id INT NOT NULL,\n" +
+                "    quantity INT NOT NULL,\n" +
+                "    price DECIMAL(10, 2) NOT NULL,\n" +
+                "    purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n" +
+                ");";
+
+
+        String sql_create_Questions = "CREATE TABLE Questions (\n" +
+                "    question_id SERIAL PRIMARY KEY,\n" +
+                "    question_text TEXT NOT NULL\n" +  // Видалено зайву кому
+                ");";
+
+        String sql_create_Answers = "CREATE TABLE Answers (\n" +
+                "    answer_id SERIAL PRIMARY KEY,\n" +
+                "    question_id INTEGER REFERENCES Questions(question_id),\n" +  // Додано велику літеру в Questions
+                "    answer_text TEXT NOT NULL\n" +  // Видалено зайву кому
+                ");";
+
+        String sql_insert_Questions = "INSERT INTO Questions (question_id, question_text) VALUES\n" +
+                "(1, 'Czy kiedykolwiek ukrył Pan/Pani przed klientem wadę produktu, aby dokonać sprzedaży?'),\n" +
+                "(2, 'Czy zgadza się Pan/Pani, że klient zawsze ma rację?'),\n" +
+                "(3, 'Czy uważa Pan/Pani, że praca w sprzedaży wymaga poświęcenia życia osobistego?'),\n" +
+                "(4, 'Czy kiedykolwiek złamał Pan/Pani politykę firmy, aby zadowolić klienta?'),\n" +
+                "(5, 'Czy zgadza się Pan/Pani na obniżkę podstawowej pensji za wyższą prowizję?'),\n" +
+                "(6, 'Czy uważa Pan/Pani, że agresywna sprzedaż jest skuteczna w długim terminie?'),\n" +
+                "(7, 'Czy kiedykolwiek skłamał Pan/Pani w CV?'),\n" +
+                "(8, 'Czy odmówiłby Pan/Pani sprzedaży, gdyby produkt był niesprawiedliwie drogi?'),\n" +
+                "(9, 'Czy zgadza się Pan/Pani, że lepszy system CRM zastąpiłby człowieka w sprzedaży?'),\n" +
+                "(10, 'Czy uważa Pan/Pani, że negocjacje zawsze kończą się kompromisem?')\n";
+
+
+
+        String sql_insert_Answers = "INSERT INTO Answers (answer_text) VALUES\n" +
+                "('nie'),\n" +
+                "('nie'),\n" +
+                "('tak'),\n" +
+                "('nie'),\n" +
+                "('tak'),\n" +
+                "('nie'),\n" +
+                "('nie'),\n" +
+                "('nie'),\n" +
+                "('nie'),\n" +
+                "('nie');";
+
+        String sql_insert_Sellers  = "INSERT INTO Sellers (name, department, salary, experience_years, rating, commission, salescount)\n" +
                 "VALUES\n" +
-                "    (35, 'Dominik Baran', 'Shoes', 0, 5, 4.3, 10, 0),\n" +
-                "    (37, 'Emil Tomaszewski', 'Cosmetics', 0, 8, 4.2, 19, 0),\n" +
-                "    (9, 'Marcin Woźniak', 'Shoes', 0, 1, 4.0, 20, 0),\n" +
-                "    (24, 'Wojciech Pawłowski', 'Garden Tools', 0, 3, 4.4, 11, 0),\n" +
-                "    (2, 'Piotr Nowak', 'Electronics', 0, 5, 4.0, 15, 0),\n" +
-                "    (32, 'Konrad Sikorski', 'Clothes', 0, 3, 4.4, 19, 0),\n" +
-                "    (33, 'Igor Ostrowski', 'Shoes', 0, 4, 3.9, 20, 0),\n" +
-                "    (40, 'Daniel Kalinowski', 'Cosmetics', 0, 2, 4.0, 20, 0),\n" +
-                "    (39, 'Aleksander Wilk', 'Cosmetics', 0, 5, 3.9, 13, 0),\n" +
-                "    (31, 'Przemysław Rutkowski', 'Clothes', 0, 9, 4.2, 19, 0),\n" +
-                "    (20, 'Artur Wieczorek', 'Garden Tools', 0, 7, 4.2, 13, 0),\n" +
-                "    (3, 'Andrzej Wiśniewski', 'Electronics', 0, 9, 4.7, 19, 0),\n" +
-                "    (28, 'Dawid Krupa', 'Electronics', 0, 2, 4.5, 10, 0),\n" +
-                "    (38, 'Patryk Szczepański', 'Cosmetics', 0, 6, 4.3, 19, 0),\n" +
-                "    (5, 'Paweł Kamiński', 'Clothes', 0, 2, 3.9, 17, 0),\n" +
-                "    (34, 'Mariusz Sadowski', 'Shoes', 0, 7, 4.5, 20, 0),\n" +
-                "    (14, 'Szymon Krawczyk', 'Cosmetics', 0, 1, 4.1, 13, 0),\n" +
-                "    (27, 'Sebastian Lis', 'Electronics', 0, 9, 4.1, 20, 0),\n" +
-                "    (1, 'Jan Kowalski', 'Electronics', 0, 5, 4.5, 16, 0),\n" +
-                "    (16, 'Rafał Grabowski', 'Cosmetics', 0, 2, 4.5, 17, 0),\n" +
-                "    (26, 'Hubert Zając', 'Electronics', 0, 7, 4.2, 12, 0),\n" +
-                "    (36, 'Karol Duda', 'Shoes', 0, 2, 4.1, 17, 0),\n" +
-                "    (15, 'Damian Piotrowski', 'Cosmetics', 0, 5, 3.6, 18, 0),\n" +
-                "    (13, 'Jakub Mazur', 'Cosmetics', 0, 7, 4.4, 10, 0),\n" +
-                "    (7, 'Michał Zieliński', 'Clothes', 0, 3, 4.3, 14, 0),\n" +
-                "    (8, 'Grzegorz Szymański', 'Clothes', 0, 3, 3.8, 13, 0),\n" +
-                "    (10, 'Adam Dąbrowski', 'Shoes', 0, 1, 4.6, 13, 0),\n" +
-                "    (11, 'Łukasz Kozłowski', 'Shoes', 0, 9, 4.8, 14, 0),\n" +
-                "    (4, 'Tomasz Wójcik', 'Electronics', 0, 7, 4.2, 12, 0),\n" +
-                "    (29, 'Kacper Walczak', 'Clothes', 0, 1, 4.0, 16, 0),\n" +
-                "    (12, 'Mateusz Jankowski', 'Shoes', 0, 7, 3.7, 14, 0),\n" +
-                "    (23, 'Maciej Górski', 'Garden Tools', 0, 2, 3.8, 16, 0),\n" +
-                "    (17, 'Dariusz Pawlak', 'Garden Tools', 0, 6, 4.0, 15, 0),\n" +
-                "    (6, 'Krzysztof Lewandowski', 'Clothes', 0, 6, 4.1, 16, 0),\n" +
-                "    (18, 'Patryk Michalski', 'Garden Tools', 0, 7, 4.3, 16, 0),\n" +
-                "    (19, 'Adrian Król', 'Garden Tools', 0, 8, 3.9, 15, 0),\n" +
-                "    (30, 'Filip Wesołowski', 'Clothes', 0, 1, 3.7, 16, 0),\n" +
-                "    (25, 'Radosław Sikora', 'Electronics', 0, 2, 4.6, 13, 0),\n" +
-                "    (21, 'Kamil Nowicki', 'Garden Tools', 0, 6, 4.1, 20, 0),\n" +
-                "    (22, 'Bartosz Czarnecki', 'Garden Tools', 0, 7, 4.3, 16, 0);";
+                "    ('Dominik Baran', 'Shoes', 0, 5, 4.3, 10, 0),\n" +
+                "    ('Emil Tomaszewski', 'Cosmetics', 0, 8, 4.2, 19, 0),\n" +
+                "    ('Marcin Woźniak', 'Shoes', 0, 1, 4.0, 20, 0),\n" +
+                "    ('Wojciech Pawłowski', 'Garden Tools', 0, 3, 4.4, 11, 0),\n" +
+                "    ('Piotr Nowak', 'Electronics', 0, 5, 4.0, 15, 0),\n" +
+                "    ('Konrad Sikorski', 'Clothes', 0, 3, 4.4, 19, 0),\n" +
+                "    ('Igor Ostrowski', 'Shoes', 0, 4, 3.9, 20, 0),\n" +
+                "    ('Daniel Kalinowski', 'Cosmetics', 0, 2, 4.0, 20, 0),\n" +
+                "    ('Aleksander Wilk', 'Cosmetics', 0, 5, 3.9, 13, 0),\n" +
+                "    ('Przemysław Rutkowski', 'Clothes', 0, 9, 4.2, 19, 0),\n" +
+                "    ('Artur Wieczorek', 'Garden Tools', 0, 7, 4.2, 13, 0),\n" +
+                "    ('Andrzej Wiśniewski', 'Electronics', 0, 9, 4.7, 19, 0),\n" +
+                "    ('Dawid Krupa', 'Electronics', 0, 2, 4.5, 10, 0),\n" +
+                "    ('Patryk Szczepański', 'Cosmetics', 0, 6, 4.3, 19, 0),\n" +
+                "    ('Paweł Kamiński', 'Clothes', 0, 2, 3.9, 17, 0),\n" +
+                "    ('Mariusz Sadowski', 'Shoes', 0, 7, 4.5, 20, 0),\n" +
+                "    ('Szymon Krawczyk', 'Cosmetics', 0, 1, 4.1, 13, 0),\n" +
+                "    ('Sebastian Lis', 'Electronics', 0, 9, 4.1, 20, 0),\n" +
+                "    ('Jan Kowalski', 'Electronics', 0, 5, 4.5, 16, 0),\n" +
+                "    ('Rafał Grabowski', 'Cosmetics', 0, 2, 4.5, 17, 0),\n" +
+                "    ('Hubert Zając', 'Electronics', 0, 7, 4.2, 12, 0),\n" +
+                "    ('Karol Duda', 'Shoes', 0, 2, 4.1, 17, 0),\n" +
+                "    ('Damian Piotrowski', 'Cosmetics', 0, 5, 3.6, 18, 0),\n" +
+                "    ('Jakub Mazur', 'Cosmetics', 0, 7, 4.4, 10, 0),\n" +
+                "    ('Michał Zieliński', 'Clothes', 0, 3, 4.3, 14, 0),\n" +
+                "    ('Grzegorz Szymański', 'Clothes', 0, 3, 3.8, 13, 0),\n" +
+                "    ('Adam Dąbrowski', 'Shoes', 0, 1, 4.6, 13, 0),\n" +
+                "    ('Łukasz Kozłowski', 'Shoes', 0, 9, 4.8, 14, 0),\n" +
+                "    ('Tomasz Wójcik', 'Electronics', 0, 7, 4.2, 12, 0),\n" +
+                "    ('Kacper Walczak', 'Clothes', 0, 1, 4.0, 16, 0),\n" +
+                "    ('Mateusz Jankowski', 'Shoes', 0, 7, 3.7, 14, 0),\n" +
+                "    ('Maciej Górski', 'Garden Tools', 0, 2, 3.8, 16, 0),\n" +
+                "    ('Dariusz Pawlak', 'Garden Tools', 0, 6, 4.0, 15, 0),\n" +
+                "    ('Krzysztof Lewandowski', 'Clothes', 0, 6, 4.1, 16, 0),\n" +
+                "    ('Patryk Michalski', 'Garden Tools', 0, 7, 4.3, 16, 0),\n" +
+                "    ('Adrian Król', 'Garden Tools', 0, 8, 3.9, 15, 0),\n" +
+                "    ('Filip Wesołowski', 'Clothes', 0, 1, 3.7, 16, 0),\n" +
+                "    ('Radosław Sikora', 'Electronics', 0, 2, 4.6, 13, 0),\n" +
+                "    ('Kamil Nowicki', 'Garden Tools', 0, 6, 4.1, 20, 0),\n" +
+                "    ('Bartosz Czarnecki', 'Garden Tools', 0, 7, 4.3, 16, 0);";
 
 
-        String sql_insert_Departments = "INSERT INTO Departments (id, name)\n" +
-                "VALUES\n" +
-                "    (1, 'Electronics'),\n" +
-                "    (2, 'Clothes'),\n" +
-                "    (3, 'Shoes'),\n" +
-                "    (4, 'Cosmetics'),\n" +
-                "    (5, 'Garden Tools');\n";
+            String sql_insert_Departments = "INSERT INTO Departments (id, name)\n" +
+                    "VALUES\n" +
+                    "    (1, 'Electronics'),\n" +
+                    "    (2, 'Clothes'),\n" +
+                    "    (3, 'Shoes'),\n" +
+                    "    (4, 'Cosmetics'),\n" +
+                    "    (5, 'Garden Tools');\n";
 
-        String sql_insert_Products = "INSERT INTO Products (id, name, price, quantity, description, brand) VALUES\n" +
+            String sql_insert_Products = "INSERT INTO Products (id, name, price, quantity, description, brand) VALUES\n" +
                 "    (1, 'iPhone 11', 6500.00, 1000, 'Telephone 256 GB', 'Apple'),\n" +
                 "    (2, 'iPhone 12', 7200.00, 1000, 'Telephone 128 GB', 'Apple'),\n" +
                 "    (3, 'iPad Air', 3800.00, 1000, 'Tablet with M1 chip', 'Apple'),\n" +
@@ -273,12 +325,12 @@ public class Database {
                 "    (119, 'Fiskars Lopper', 240.00, 1000, 'Tree branch cutter', 'Fiskars'),\n" +
                 "    (120, 'Fiskars Gloves', 55.00, 1000, 'Grip gloves', 'Fiskars');";
 
-        String sql_insert_Managers =  "INSERT INTO Managers (id, name, department, income, commission, experience) VALUES\n" +
-                "    (1, 'Monika', 'Electronics', 0.00, 1, 6),\n" +
-                "    (5, 'Piotr', 'Garden Tools', 0.00, 2, 5),\n" +
-                "    (4, 'Jan', 'Cosmetics', 0.00, 3, 4),\n" +
-                "    (2, 'Adam', 'Clothes', 0.00, 2, 7),\n" +
-                "    (3, 'Katarzyna', 'Shoes', 0.00, 1, 3);";
+        String sql_insert_Managers =  "INSERT INTO Managers ( name, department, income, commission, experience) VALUES\n" +
+                "    ('Monika', 'Electronics', 0.00, 1, 6),\n" +
+                "    ('Piotr', 'Garden Tools', 0.00, 2, 5),\n" +
+                "    ('Jan', 'Cosmetics', 0.00, 3, 4),\n" +
+                "    ('Adam', 'Clothes', 0.00, 2, 7),\n" +
+                "    ('Katarzyna', 'Shoes', 0.00, 1, 3);";
 
         String sql_insert_Brands  = "INSERT INTO Brands (id, name, department) VALUES\n" +
                 "    (1, 'Apple', 'Electronics'),\n" +
@@ -302,184 +354,65 @@ public class Database {
                 "    (19, 'Stihl', 'Garden Tools'),\n" +
                 "    (20, 'Fiskars', 'Garden Tools');";
 
-        String sql_insert_Boss = "INSERT INTO Boss ( name, income) VALUES\n" +
-                "('Artur', 0.00);";
+        String sql_insert_Boss = "INSERT INTO Boss (id, name, income) VALUES\n" +
+                "(0,'Artur', 0.00);";
+
      try (Statement st1 = conection.createStatement()) {
          st1.executeUpdate(sql_create_Boss);
-         System.out.println("Created Boss");
      }
      try (Statement st2 = conection.createStatement()) {
          st2.executeUpdate(sql_create_Departments);
-         System.out.println("Created Departments");
      }
      try (Statement st3 = conection.createStatement()) {
          st3.executeUpdate(sql_create_Brands);
-         System.out.println("Created Brands");
      }
      try (Statement st4 = conection.createStatement()) {
          st4.executeUpdate(sql_create_Managers);
-         System.out.println("Created Managers");
      }
      try (Statement st5 = conection.createStatement()) {
          st5.executeUpdate(sql_create_Sellers);
-         System.out.println("Created Sellers");
      }
      try (Statement st6 = conection.createStatement()) {
          st6.executeUpdate(sql_create_Products);
-         System.out.println("Created Products");
      }
      try (Statement st7 = conection.createStatement()) {
          st7.executeUpdate(sql_create_Reviews);
-         System.out.println("Created Reviews");
      }
      try (Statement st8 = conection.createStatement()) {
          st8.executeUpdate(sql_insert_Boss);
-         System.out.println("Updated Boss");
      }
      try (Statement st9 = conection.createStatement()) {
          st9.executeUpdate(sql_insert_Departments);
-         System.out.println("Updated Departments");
      }
      try (Statement st10 = conection.createStatement()) {
          st10.executeUpdate(sql_insert_Managers);
-         System.out.println("Updated Managers");
      }
      try (Statement st11 = conection.createStatement()) {
          st11.executeUpdate(sql_insert_Brands);
-         System.out.println("Updated Brands");
      }
      try (Statement st12 = conection.createStatement()) {
          st12.executeUpdate(sql_insert_Sellers);
-         System.out.println("Updated Sellers");
      }
      try (Statement st13 = conection.createStatement()) {
          st13.executeUpdate(sql_insert_Products);
-         System.out.println("Updated Products");
+     }
+     try(Statement st14 = conection.createStatement()) {
+         st14.executeUpdate(sql_create_Purchase_History);
+     }
+     try(Statement st15 = conection.createStatement()) {
+         st15.executeUpdate(sql_create_Questions);
+     }
+     try(Statement st16 = conection.createStatement()) {
+         st16.executeUpdate(sql_insert_Questions);
+     }
+     try(Statement st17 = conection.createStatement()) {
+         st17.executeUpdate(sql_create_Answers);
+     }
+     try(Statement st18 = conection.createStatement()) {
+         st18.executeUpdate(sql_insert_Answers);
      }
     }
 
-
-
-
-//    public void setDepartmentsFromDB() throws SQLException {
-//        String sql = "SELECT * FROM Department";
-//        PreparedStatement st = conection.prepareStatement(sql);
-//        ResultSet rs = st.executeQuery();
-//        while (rs.next()) {
-//            department.add(new Department(rs.getString("name")));
-//        }
-//    }
-
-
-//    public void setManagersFromDB() throws SQLException {
-//        String sql = "SELECT * FROM Manager";
-//        PreparedStatement st = conection.prepareStatement(sql);
-//        ResultSet rs = st.executeQuery();
-//        while (rs.next()) {
-//            int id = rs.getInt("id");
-//            String name = rs.getString("name");
-//            String depname = rs.getString("department");
-//            float income = rs.getFloat("income");
-//            float commission = rs.getFloat("commission");
-//            int experience = rs.getInt("experience");
-//            managers.add(new Manager(id, name,getDep(depname), income, commission, experience));
-//        }
-//    }
-//
-//    public Department getDep(String depName) {
-//        if (depName == null) return null;
-//        for (Department dep : department) {
-//            if (depName.trim().equalsIgnoreCase(dep.getName().trim())) {
-//                return dep;
-//            }
-//        }
-//        return null;
-//    }
-
-//    public void setSellersFromDB(int min,int max) throws SQLException {
-//        Random rand = new Random();
-//        String sql = "SELECT * FROM Seler";
-//        PreparedStatement st = conection.prepareStatement(sql);
-//        ResultSet rs = st.executeQuery();
-//        while (rs.next()) {
-//            int id = rs.getInt("id");
-//            String name = rs.getString("name");
-//            String depname = rs.getString("department");
-//            float income = rs.getFloat("salary");
-//            float commision = rs.getFloat("commission");
-//            int salesCount = rs.getInt("salescount");
-//            float rating = rs.getFloat("rating");
-//            int experience = min + rand.nextInt(max - min);
-////            int experience = rs.getInt("experience_years");
-//            sellers.add(new Seller(id, name,getDep(depname),income, commision,experience, salesCount, rating));
-////            for (Department dep : department) {
-////                if (departmentname.equals(dep.getName())) {
-////                    sellers.add(new Seller(id, name, dep, income, commision, salesCount, rating, experience));
-////                }
-////            }
-//        }
-//    }
-
-//    public void setBrandFromDB() throws SQLException {
-//        String sql = "SELECT * FROM Brand";
-//        PreparedStatement st = conection.prepareStatement(sql);
-//        ResultSet rs = st.executeQuery();
-//        while (rs.next()) {
-//            String name = rs.getString("name");
-//            String depname = rs.getString("department");
-//            brands.add(new Brand(name, getDep(depname)));
-//        }
-//    }
-//
-//    public void setProductsFromDB() throws SQLException {
-//        String sql = "SELECT * FROM Product";
-//        PreparedStatement st = conection.prepareStatement(sql);
-//        ResultSet rs = st.executeQuery();
-//        while (rs.next()) {
-//            String name = rs.getString("name");
-//            float price = rs.getFloat("price");
-//            int quantity = rs.getInt("quantity");
-//            String description = rs.getString("description");
-//            String brand = rs.getString("brand");
-//            Brand brand1 = getBrand(brand);
-//            if (brand1 == null) {
-//                System.out.println("❌ Brand nie znaleziono: " + brand);
-//                continue; // albo throw new RuntimeException()
-//            }
-//
-//            products.add(new Product(name, price, quantity, description, getBrand(brand)));
-//        }
-//    }
-//
-//    public Brand getBrand(String brandName) {
-//        if (brandName == null) return null;
-//        for (Brand brand : brands) {
-//            if (brandName.trim().equalsIgnoreCase(brand.getName().trim())) {
-//                return brand;
-//            }
-//        }
-//        return null;
-//    }
-
-//    public void setBossFromDB() throws SQLException {
-//        String sql = "SELECT * FROM Boss";
-//        PreparedStatement st = conection.prepareStatement(sql);
-//        ResultSet rs = st.executeQuery();
-//        while (rs.next()) {
-//            int id = rs.getInt("unik_id");
-//            String name = rs.getString("name");
-//            float income = rs.getFloat("income");
-////            boss = new Boss();
-//        }
-//    }
-
-//    public void updateQuantityInDB(Product product, int quantity) throws SQLException {
-//        String sql = "UPDATE Product SET quantity = ? WHERE name = ?";
-//        PreparedStatement st = conection.prepareStatement(sql);
-//        st.setInt(1, quantity);
-//        st.setString(2, product.getName());
-//        st.executeUpdate();
-//    }
 
     public void updateDataBase(Product product, Seller seller, Manager manager) throws SQLException {
         String sql = "UPDATE Product SET quantity = ? WHERE name = ?";
@@ -508,28 +441,68 @@ public class Database {
     }
 
     public void cleanDB() throws SQLException {
-        String sql1 = "DROP TABLE Boss";
-        String sql2 = "DROP TABLE Departments";
-        String sql3 = "DROP TABLE Brands";
-        String sql4 = "DROP TABLE Managers";
-        String sql5 = "DROP TABLE Products";
-        String sql6 = "DROP TABLE Sellers";
-        String sql7 = "DROP TABLE Reviews";
-        PreparedStatement st1 = conection.prepareStatement(sql1);
-        PreparedStatement st2 = conection.prepareStatement(sql2);
-        PreparedStatement st3 = conection.prepareStatement(sql3);
-        PreparedStatement st4 = conection.prepareStatement(sql4);
-        PreparedStatement st5 = conection.prepareStatement(sql5);
-        PreparedStatement st6 = conection.prepareStatement(sql6);
-        PreparedStatement st7 = conection.prepareStatement(sql7);
-        st1.executeUpdate();
-        st2.executeUpdate();
-        st3.executeUpdate();
-        st4.executeUpdate();
-        st5.executeUpdate();
-        st6.executeUpdate();
-        st7.executeUpdate();
+//        System.out.println("🧹 Wywołano cleanDB()");
+        // 1. Zadbaj o właściwe nazwy tabel (małymi literami, bez literówek!)
+        String[] tables = {
+                "answers",          // najpierw usuwaj te z FK
+                "questions",
+                "purchase_history",
+                "reviews",
+                "sellers",
+                "managers",
+                "brands",
+                "departments",
+                "products",
+                "boss"              // na koniec Boss (choć CASCADE i tak ogarnie zależności)
+        };
+
+        for (String tbl : tables) {
+            String sql = "DROP TABLE IF EXISTS " + tbl + " CASCADE";
+            try (PreparedStatement ps = conection.prepareStatement(sql)) {
+                ps.executeUpdate();
+//                System.out.println("  → Usunięto lub nie istniała tabela: " + tbl);
+            } catch (SQLException e) {
+                // Nie przerywaj pętli – wypisz błąd, ale idź dalej
+//                System.err.println("❌ Błąd przy DROP TABLE " + tbl + ": " + e.getMessage());
+            }
+        }
+//        System.out.println("✅ cleanDB() zakończone");
+
     }
+//        System.out.println("Vasily clean DB...");
+//        String sql1 = "DROP TABLE IF EXISTS Boss CASCADE";
+//        String sql2 = "DROP TABLE IF EXISTS Departments";
+//        String sql3 = "DROP TABLE IF EXISTS Brands";
+//        String sql4 = "DROP TABLE IF EXISTS Managers";
+//        String sql5 = "DROP TABLE IF EXISTS Products";
+//        String sql6 = "DROP TABLE IF EXISTS Sellers";
+//        String sql7 = "DROP TABLE IF EXISTS Reviews";
+//        String sql8 = "DROP TABLE IF EXISTS Purchase_History";
+//        String sql9 = "DROP TABLE IF EXISTS Quastions";
+//        String sql10 = "DROP TABLE IF EXISTS Answers";
+//        PreparedStatement st1 = conection.prepareStatement(sql1);
+//        PreparedStatement st2 = conection.prepareStatement(sql2);
+//        PreparedStatement st3 = conection.prepareStatement(sql3);
+//        PreparedStatement st4 = conection.prepareStatement(sql4);
+//        PreparedStatement st5 = conection.prepareStatement(sql5);
+//        PreparedStatement st6 = conection.prepareStatement(sql6);
+//        PreparedStatement st7 = conection.prepareStatement(sql7);
+//        PreparedStatement st8 = conection.prepareStatement(sql8);
+//        PreparedStatement st9 = conection.prepareStatement(sql9);
+//        PreparedStatement st10 = conection.prepareStatement(sql10);
+//
+//        st2.executeUpdate();
+//        st3.executeUpdate();
+//        st4.executeUpdate();
+//        st5.executeUpdate();
+//        st6.executeUpdate();
+//        st7.executeUpdate();
+//        st8.executeUpdate();
+//        st9.executeUpdate();
+//        st10.executeUpdate();
+//        System.out.println("Done");
+//        st1.executeUpdate();
+//    }
 
     public List<Department> getDepartments() {
         return department;

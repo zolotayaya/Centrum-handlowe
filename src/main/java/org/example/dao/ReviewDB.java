@@ -1,15 +1,5 @@
 package org.example.dao;
 
-import org.example.Review;
-import org.example.database.Database;
-import org.example.model.Product;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 public class ReviewDB {
 //    private Connection connection;
 //    private List<Review> reviews;

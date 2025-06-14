@@ -1,8 +1,9 @@
 package org.example.app;
 
 import org.example.DataExporter;
-import org.example.ReportingService;
-import org.example.SaleSystem;
+import org.example.model.PurchaseHistory;
+import org.example.model.ReportingService;
+import org.example.model.SaleSystem;
 import org.example.dao.BrandDB;
 import org.example.dao.ManagerDB;
 import org.example.dao.ProductDB;
@@ -12,13 +13,11 @@ import org.example.model.Manager;
 import org.example.model.Product;
 import org.example.model.Seller;
 
-import javax.naming.BinaryRefAddr;
 import java.sql.SQLException;
 import java.util.*;
 
-import static org.example.dao.ManagerDB.managers;
-
 public class Director extends Window {
+    private PurchaseHistory purchaseHistory;
     public static void directorInterface(ManagerDB managers, SellerDB sellers, ProductDB products, BrandDB brands, SaleSystem salesystem, ReportingService reportingService, DataExporter dataExporter) throws SQLException {
         // This is your original main menu functionality
         while (true) {
@@ -168,16 +167,24 @@ public class Director extends Window {
         int maxExp = getIntInput(minExp, 50);
 
         sellers.setExperience(minExp, maxExp);
+        System.out.println("Experience setted");
 List<Brand> brandList = brands.getBrands();
+        System.out.println("Brands setted");
 List<Seller> sellerList = sellers.getSellers();
+System.out.println("Sellers setted");
         Set<Seller> assignedSellers = new HashSet<>();
 
         printStatus("Start of sales simulation..");
-        for (Brand brand : brandList) {
-            for (Seller seler : sellerList) {
-                if (!assignedSellers.contains(seler) && Objects.equals(seler.getDepartment(), brand.getDepartment())) {
-                    brand.setExpert(seler);
-                    assignedSellers.add(seler);
+        for(Brand brand : brandList) {
+            for (Seller seller : sellerList) {
+                if (!assignedSellers.contains(seller) &&
+                        seller.getDepartment() != null &&
+                        brand.getDepartment() != null &&
+                        seller.getDepartment().getName().equals(brand.getDepartment().getName())) {
+
+                    brand.setExpert(seller);
+                    assignedSellers.add(seller);
+                    System.out.println("Assigned " + seller.getName() + " to " + brand.getName());
                     break;
                 }
             }
@@ -187,12 +194,18 @@ List<Seller> sellerList = sellers.getSellers();
                 for (int h = 0; h < hours; h++) {
                     Product randomProduct = products.getProducts().get((int)(Math.random() * products.getProducts().size()));
                     Brand brand = randomProduct.getBrand();
+                    System.out.println("Brand name: " + brand.getName());
                     List<Seller> experts = brand.getExperts();
-                    System.out.println("Length of experts: " + experts.size());
-                    Seller seller = experts.get((int)(Math.random() * experts.size()));
+                    System.out.println("Experts size: " + experts.size());
+                    if(experts == null || experts.isEmpty()) {
+                        printError("Error");
+                        return;
+                    }
+                         Seller seller = experts.get((int) (Math.random() * experts.size()));
 
                     saleSystem.processPurchase(randomProduct, seller, 1, 1);
                     products.updateQuantityInDB(randomProduct, randomProduct.getQuantity());
+
 
                     System.out.printf("%s[Week %d, Day %d, Hour %d]%s Sold: %s%s%s by seller %s%s%s, Remaining: %s%d%s\n",
                             Colors.BLUE.get(), w+1, d+1, h+1, Colors.RESET.get(),
