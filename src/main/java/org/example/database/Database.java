@@ -100,7 +100,9 @@ public class Database {
         String sql_create_Reviews = "CREATE TABLE Reviews(\n" +
                 "product_id INTEGER,\n" +
                 "product_name VARCHAR(100),\n" +
-                "rating DECIMAL(10, 1) DEFAULT 0.00\n" +
+                "rating DECIMAL(10, 1) DEFAULT 0.00,\n" +
+                "comment VARCHAR(100) NOT NULL,\n" +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n" +
                 ");";
 
         String sql_create_Purchase_History = "CREATE TABLE Purchase_History (\n" +

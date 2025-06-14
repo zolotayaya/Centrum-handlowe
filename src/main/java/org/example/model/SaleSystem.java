@@ -15,9 +15,7 @@ public class SaleSystem {
             }
             seller.saleProduct(product, quantity);
             PurchaseRecord record = new PurchaseRecord(product, seller,quantity, buyerID);
-            System.out.println("Purchase recor added");
             purchaseHistory.addPurchase(record);  // Zwiazek z PurchaseHistory
-            System.out.println("Purchase hisstory updated");
             System.out.println("The sale ended succsesful!");
             return record;
         }

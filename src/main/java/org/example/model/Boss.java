@@ -61,4 +61,8 @@ public float getIncome() {
         }
         return Total;
     }
+    public Boss getBoss() {
+        return Boss.this;
+    }
+
 }

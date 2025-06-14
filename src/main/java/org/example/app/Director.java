@@ -1,6 +1,6 @@
 package org.example.app;
 
-import org.example.DataExporter;
+import org.example.model.DataExporter;
 import org.example.model.PurchaseHistory;
 import org.example.model.ReportingService;
 import org.example.model.SaleSystem;
@@ -94,6 +94,7 @@ public class Director extends Window {
 
         printTableHeader(new String[]{"Name", "Brand", "Department", "Price", "Quantity", "Description"});
         for (Product product : products.getProducts()) {
+            System.out.println("Product ID:" + product.getId());
             printTableRow(new String[]{
                     product.getName(),
                     product.getBrand().getName(),
@@ -168,10 +169,10 @@ public class Director extends Window {
 
         sellers.setExperience(minExp, maxExp);
         System.out.println("Experience setted");
-List<Brand> brandList = brands.getBrands();
+        List<Brand> brandList = brands.getBrands();
         System.out.println("Brands setted");
-List<Seller> sellerList = sellers.getSellers();
-System.out.println("Sellers setted");
+        List<Seller> sellerList = sellers.getSellers();
+        System.out.println("Sellers setted");
         Set<Seller> assignedSellers = new HashSet<>();
 
         printStatus("Start of sales simulation..");
@@ -184,7 +185,6 @@ System.out.println("Sellers setted");
 
                     brand.setExpert(seller);
                     assignedSellers.add(seller);
-                    System.out.println("Assigned " + seller.getName() + " to " + brand.getName());
                     break;
                 }
             }
@@ -194,15 +194,12 @@ System.out.println("Sellers setted");
                 for (int h = 0; h < hours; h++) {
                     Product randomProduct = products.getProducts().get((int)(Math.random() * products.getProducts().size()));
                     Brand brand = randomProduct.getBrand();
-                    System.out.println("Brand name: " + brand.getName());
                     List<Seller> experts = brand.getExperts();
-                    System.out.println("Experts size: " + experts.size());
                     if(experts == null || experts.isEmpty()) {
                         printError("Error");
                         return;
                     }
                          Seller seller = experts.get((int) (Math.random() * experts.size()));
-
                     saleSystem.processPurchase(randomProduct, seller, 1, 1);
                     products.updateQuantityInDB(randomProduct, randomProduct.getQuantity());
 

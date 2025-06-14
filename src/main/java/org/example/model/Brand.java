@@ -21,8 +21,6 @@ public class Brand {
         this.experts.add(expert);
     }
 
-//        System.out.println("Expert is set");
-
     public void addProduct(Product product) {
         products.add(product);
     }
@@ -58,7 +56,6 @@ public class Brand {
     }
 
     public List<Seller> getExperts() {
-        System.out.println("Size" + experts.size());
         return experts;
     }
 }

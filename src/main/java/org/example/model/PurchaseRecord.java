@@ -7,8 +7,6 @@ public class PurchaseRecord {
     private int quantity;
     private float price;
 
-    // private LocalDateTime date;
-    // private int reviewScore;
     public PurchaseRecord(Product product, Seller seller, int quantity, int buyerID) {
         this.product = product;
         this.seller = seller;

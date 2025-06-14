@@ -53,7 +53,7 @@ public class BossDB {
     public static Boss getBoss() {
         return instance;
     }
-
+//
 //    public void addDepartment(Department department) {
 //        if (!allDepartment.contains(department)) {
 //            allDepartment.add(department);
@@ -75,7 +75,7 @@ public class BossDB {
 //    }
 
     public  void updateIncomeInDatabase() throws SQLException {
-             PreparedStatement stmt = connection.prepareStatement("UPDATE boss SET income = ? WHERE id = 1");
+             PreparedStatement stmt = connection.prepareStatement("UPDATE Boss SET income = ? WHERE id = 1");
             stmt.setFloat(1, instance.getIncome());
             stmt.executeUpdate();
     }

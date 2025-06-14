@@ -8,12 +8,13 @@ public class Product {
     private String description;
     private Brand brand;
 
-    public Product(String model, float price, int quantity,  String description, Brand brand) {
+    public Product(String model, float price, int quantity,  String description, Brand brand, int id) {
         this.model = model;
         this.price = price;
         this.quantity = quantity;
         this.description = description;
         this.brand=brand;
+        this.id=id;
         if (brand!=null){
             brand.addProduct(this);
         }
