@@ -58,13 +58,13 @@ public class Seller extends Employee implements IPromotable {
 
     @Override
     public boolean checkPromotionCondition() {
-        System.out.println("checkPromotionCondition called");
+        //System.out.println("checkPromotionCondition called");
         Department department = getDepartment();
-        System.out.println("Department: " + department);
+        //System.out.println("Department: " + department);
         if (department != null) {
-            System.out.println("Number of sellers in department: " + department.getSellers().size());
+            //System.out.println("Number of sellers in department: " + department.getSellers().size());
         } else {
-            System.out.println("Department is null");
+            //System.out.println("Department is null");
             System.out.println(salesCount);
         }
         return salesCount >= 5 && department != null && department.getSellers().size() > 1;
