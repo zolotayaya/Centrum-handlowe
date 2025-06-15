@@ -48,9 +48,10 @@ docker --version
 
 ### 1. Clone the Repository
 
+```bash
 git clone https://github.com/zolotayaya/Centrum-handlowe
 cd Centrum-handlowe
-
+```
 
 ### 2. Start PostgreSQL Database
 
