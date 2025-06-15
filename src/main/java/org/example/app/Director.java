@@ -1,17 +1,7 @@
 package org.example.app;
 
-import org.example.model.DataExporter;
-import org.example.model.PurchaseHistory;
-import org.example.dao.ReportingService;
-import org.example.model.SaleSystem;
-import org.example.dao.BrandDB;
-import org.example.dao.ManagerDB;
-import org.example.dao.ProductDB;
-import org.example.dao.SellerDB;
-import org.example.model.Brand;
-import org.example.model.Manager;
-import org.example.model.Product;
-import org.example.model.Seller;
+import org.example.dao.*;
+import org.example.model.*;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -210,7 +200,17 @@ public class Director extends Window {
                     int randomId = new Random().nextInt(9000) + 1000; //  ID
                     saleSystem.processPurchase(randomProduct, seller, randomQuantity, randomId);
                     products.updateQuantityInDB(randomProduct, randomProduct.getQuantity());
+                    SellerDB.updateSellerStats(seller);
+                    Manager manager = seller.getDepartment().getManager();
+                    if (manager != null) {
+                        ManagerDB.updateManagerIncome(manager);
+                    }
 
+                    Boss boss = BossDB.getBoss();
+                    if (boss != null) {
+                        BossDB bossDB =new BossDB();
+                        bossDB.updateIncomeInDatabase();
+                    }
 
                     System.out.printf("%s[Week %d, Day %d, Hour %d]%s Sold: %s%s%s by seller %s%s%s, Remaining: %s%d%s\n",
                             Colors.BLUE.get(), w+1, d+1, h+1, Colors.RESET.get(),

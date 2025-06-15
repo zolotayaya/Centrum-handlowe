@@ -48,6 +48,8 @@ public class Seller extends Employee implements IPromotable {
                 manager.addIncome(totalPrice* (manager.getCommision()/100f));
             }
         }
+        Boss boss =Boss.getInstance();
+        boss.addIncome(totalPrice * 0.01f);
 
         if (checkPromotionCondition()) {
             executePromotion();
