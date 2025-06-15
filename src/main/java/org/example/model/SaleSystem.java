@@ -16,7 +16,7 @@ public class SaleSystem {
             seller.saleProduct(product, quantity);
             PurchaseRecord record = new PurchaseRecord(product, seller,quantity, buyerID);
             purchaseHistory.addPurchase(record);
-            System.out.println("The sale ended succsesful!");
+            //System.out.println("The sale ended succsesful!");
 
         }
         public PurchaseHistory getPurchaseHistory() {

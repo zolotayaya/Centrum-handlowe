@@ -63,16 +63,16 @@ public abstract class Window {
     public static void printTableHeader(String[] columns) {
         System.out.print(BOLD + BLUE);
         for (String col : columns) {
-            System.out.printf("│ %-15s ", col);
+            System.out.printf("│ %-25s ", col);
         }
         System.out.println("│" + RESET);
-        System.out.println(BLUE + "├" + "─────────────────┼".repeat(columns.length - 1) + "─────────────────┤" + RESET);
+        System.out.println(BLUE + "├" + "───────────────────────────┼".repeat(columns.length - 1) + "───────────────────────────┤" + RESET);
     }
 
     public static void printTableRow(String[] values, String color) {
         System.out.print(color);
         for (String val : values) {
-            System.out.printf("│ %-15s ", val);
+            System.out.printf("│ %-25s ", val);
         }
         System.out.println("│" + RESET);
         }

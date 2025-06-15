@@ -71,7 +71,7 @@ public class ProductDB {
         st.setInt(1, quantity);
         st.setString(2, product.getName());
         st.executeUpdate();
-        System.out.println("Quantity updated in DB: " + quantity);
+        //System.out.println("Quantity updated in DB: " + quantity);
     }
 
     public List<Product> getProducts() {
