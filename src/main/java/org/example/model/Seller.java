@@ -30,13 +30,13 @@ public class Seller extends Employee implements IPromotable {
 
 
     public void saleProduct(Product product, int quantity) {
-        System.out.println("saleProduct called");
+        //System.out.println("saleProduct called");
         if (promotedTo != null) {
             System.out.println("This seller has already been promoted and cannot sell anymore.");
             return;
         }
         float totalPrice= product.getPrice()*quantity;
-        System.out.println("Solded :" + product.getName());
+        System.out.println("Product name: " + product.getName());
         product.updateQuantity(quantity);
         salesCount += 1;
         income+= totalPrice * (getCommision()/100f);
@@ -58,13 +58,13 @@ public class Seller extends Employee implements IPromotable {
 
     @Override
     public boolean checkPromotionCondition() {
-        System.out.println("checkPromotionCondition called");
+        //System.out.println("checkPromotionCondition called");
         Department department = getDepartment();
-        System.out.println("Department: " + department);
+        //System.out.println("Department: " + department);
         if (department != null) {
-            System.out.println("Number of sellers in department: " + department.getSellers().size());
+            //System.out.println("Number of sellers in department: " + department.getSellers().size());
         } else {
-            System.out.println("Department is null");
+            //System.out.println("Department is null");
             System.out.println(salesCount);
         }
         return salesCount >= 5 && department != null && department.getSellers().size() > 1;
@@ -72,9 +72,9 @@ public class Seller extends Employee implements IPromotable {
 
     @Override
     public void executePromotion() {
-        System.out.println("executePromotion called");
-        System.out.println("Sales count: " + salesCount);
-        System.out.println("Promotion condition: " + checkPromotionCondition());
+        //System.out.println("executePromotion called");
+        //System.out.println("Sales count: " + salesCount);
+        //System.out.println("Promotion condition: " + checkPromotionCondition());
         Department department = getDepartment();
         if (department == null) return;
         System.out.print("Error1");

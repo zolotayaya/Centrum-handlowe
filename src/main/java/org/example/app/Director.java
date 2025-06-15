@@ -52,7 +52,7 @@ public class Director extends Window {
         clearScreen();
         printHeader("List of employees");
 
-
+        printSubHeader("Managers");
         printTableHeader(new String[]{"ID", "Name", "Department", "Income", "Experience"});
         for (Manager manager : managers.getManagers()) {
             printTableRow(new String[]{
@@ -162,11 +162,11 @@ public class Director extends Window {
         int maxExp = getIntInput(minExp, 50);
 
         sellers.setExperience(minExp, maxExp);
-        System.out.println("Experience setted");
+        //System.out.println("Experience setted");
         List<Brand> brandList = brands.getBrands();
-        System.out.println("Brands setted");
+        //System.out.println("Brands setted");
         List<Seller> sellerList = sellers.getSellers();
-        System.out.println("Sellers setted");
+        //System.out.println("Sellers setted");
         Set<Seller> assignedSellers = new HashSet<>();
 
         printStatus("Start of sales simulation..");
