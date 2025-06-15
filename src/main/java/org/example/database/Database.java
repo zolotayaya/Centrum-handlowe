@@ -19,8 +19,7 @@ public class Database {
     private static Database instance;
 
     public Database() {
-        connection();  // połączenie wywołujemy raz podczas tworzenia obiektu
-        // inicjalizacja list
+        connection();
         sellers = new ArrayList<>();
         managers = new ArrayList<>();
         brands = new ArrayList<>();
@@ -29,7 +28,7 @@ public class Database {
         sales = new ArrayList<>();
     }
 
-        public static Database getInstance() { //Singleton
+        public static Database getInstance() {
             if(instance == null) {
                 instance = new Database();
             }
@@ -443,10 +442,9 @@ public class Database {
     }
 
     public void cleanDB() throws SQLException {
-//        System.out.println("🧹 Wywołano cleanDB()");
-        // 1. Zadbaj o właściwe nazwy tabel (małymi literami, bez literówek!)
+
         String[] tables = {
-                "answers",          // najpierw usuwaj te z FK
+                "answers",
                 "questions",
                 "purchase_history",
                 "reviews",
@@ -455,56 +453,22 @@ public class Database {
                 "brands",
                 "departments",
                 "products",
-                "boss"              // na koniec Boss (choć CASCADE i tak ogarnie zależności)
+                "boss"
         };
 
         for (String tbl : tables) {
             String sql = "DROP TABLE IF EXISTS " + tbl + " CASCADE";
             try (PreparedStatement ps = conection.prepareStatement(sql)) {
                 ps.executeUpdate();
-//                System.out.println("  → Usunięto lub nie istniała tabela: " + tbl);
+
             } catch (SQLException e) {
-                // Nie przerywaj pętli – wypisz błąd, ale idź dalej
-//                System.err.println("❌ Błąd przy DROP TABLE " + tbl + ": " + e.getMessage());
+
             }
         }
-//        System.out.println("✅ cleanDB() zakończone");
+
 
     }
-//        System.out.println("Vasily clean DB...");
-//        String sql1 = "DROP TABLE IF EXISTS Boss CASCADE";
-//        String sql2 = "DROP TABLE IF EXISTS Departments";
-//        String sql3 = "DROP TABLE IF EXISTS Brands";
-//        String sql4 = "DROP TABLE IF EXISTS Managers";
-//        String sql5 = "DROP TABLE IF EXISTS Products";
-//        String sql6 = "DROP TABLE IF EXISTS Sellers";
-//        String sql7 = "DROP TABLE IF EXISTS Reviews";
-//        String sql8 = "DROP TABLE IF EXISTS Purchase_History";
-//        String sql9 = "DROP TABLE IF EXISTS Quastions";
-//        String sql10 = "DROP TABLE IF EXISTS Answers";
-//        PreparedStatement st1 = conection.prepareStatement(sql1);
-//        PreparedStatement st2 = conection.prepareStatement(sql2);
-//        PreparedStatement st3 = conection.prepareStatement(sql3);
-//        PreparedStatement st4 = conection.prepareStatement(sql4);
-//        PreparedStatement st5 = conection.prepareStatement(sql5);
-//        PreparedStatement st6 = conection.prepareStatement(sql6);
-//        PreparedStatement st7 = conection.prepareStatement(sql7);
-//        PreparedStatement st8 = conection.prepareStatement(sql8);
-//        PreparedStatement st9 = conection.prepareStatement(sql9);
-//        PreparedStatement st10 = conection.prepareStatement(sql10);
-//
-//        st2.executeUpdate();
-//        st3.executeUpdate();
-//        st4.executeUpdate();
-//        st5.executeUpdate();
-//        st6.executeUpdate();
-//        st7.executeUpdate();
-//        st8.executeUpdate();
-//        st9.executeUpdate();
-//        st10.executeUpdate();
-//        System.out.println("Done");
-//        st1.executeUpdate();
-//    }
+
 
     public List<Department> getDepartments() {
         return department;

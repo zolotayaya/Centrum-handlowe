@@ -16,22 +16,33 @@ public class Brand {
         this.experts = new ArrayList<>();
     }
 
+    //public void setExpert(Seller expert) {
+//        this.experts.add(expert);
+//    }
     public void setExpert(Seller expert) {
-        this.experts.add(expert);
+        if (!experts.contains(expert)) {
+            experts.add(expert);
+        }
     }
+
 
     public void addProduct(Product product) {
         products.add(product);
     }
 
     public String getDetails() {
-            String result = "Brand ID: " + id +
-                    ", Name: " + name +
-                    ", Expert: " + experts.get(0).getName() + experts.get(1).getName() +
-                    "\nProducts:\n";
-            for (Product product : products) {
-                result += " - " + product.getDetails() + "\n";
+        String result = "Brand ID: " + id + ", Name: " + name;
+
+        if (!experts.isEmpty()) {
+            result += ", Experts: ";
+            for (Seller expert : experts) {
+                result += expert.getName() + " ";
             }
+        } else {
+            result += ", No experts assigned.";
+        }
+        result += "\nProducts:\n";
+
         return result;
     }
 
@@ -55,6 +66,7 @@ public class Brand {
     }
 
     public List<Seller> getExperts() {
+        System.out.println("Size" + experts.size());
         return experts;
     }
 }

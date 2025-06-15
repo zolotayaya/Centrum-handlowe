@@ -14,10 +14,6 @@ public class Boss{
     private List<Department> allDepartment;
     private final int id = 1;
 
-    public String makeReport() {
-        return "Hello";
-    }
-
 
     public Boss(String name, float income) {
         this.name=name;
@@ -43,7 +39,7 @@ public class Boss{
     }
     public void addIncome(float amount) {
         this.income += amount;
-//        BossDB.updateIncomeInDatabase();
+
     }
     public float getIncome() {
         return income;
@@ -62,7 +58,7 @@ public class Boss{
     public static Boss getInstance()  {
         if (instance == null) {
             try {
-                instance = BossDB.setBossFromDB(); // загрузи из базы
+                instance = BossDB.setBossFromDB();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

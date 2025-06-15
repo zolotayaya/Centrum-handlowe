@@ -13,7 +13,7 @@ public class Department {
         this.employees=new ArrayList<>();
     }
 
-    public List<Product> getProductsByBrande(Brand brand){
+    public List<Product> getProductsByBrand(Brand brand){
         return new ArrayList<>();
     }
 
@@ -81,5 +81,5 @@ public class Department {
     }
 
 
-    //public void Metoda(){}
+
 }

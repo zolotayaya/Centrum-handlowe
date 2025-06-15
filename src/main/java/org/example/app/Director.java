@@ -2,7 +2,7 @@ package org.example.app;
 
 import org.example.model.DataExporter;
 import org.example.model.PurchaseHistory;
-import org.example.model.ReportingService;
+import org.example.dao.ReportingService;
 import org.example.model.SaleSystem;
 import org.example.dao.BrandDB;
 import org.example.dao.ManagerDB;
@@ -15,6 +15,8 @@ import org.example.model.Seller;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Director extends Window {
@@ -203,7 +205,10 @@ public class Director extends Window {
                         return;
                     }
                     Seller seller = experts.get((int) (Math.random() * experts.size()));
-                    saleSystem.processPurchase(randomProduct, seller, 1, 1);
+                    int maxPerPurchase = Math.min(randomProduct.getQuantity(), 10);
+                    int randomQuantity = new Random().nextInt(maxPerPurchase) + 1;
+                    int randomId = new Random().nextInt(9000) + 1000; //  ID
+                    saleSystem.processPurchase(randomProduct, seller, randomQuantity, randomId);
                     products.updateQuantityInDB(randomProduct, randomProduct.getQuantity());
 
 
@@ -217,7 +222,7 @@ public class Director extends Window {
         }
 
         printSuccess("Simulation completed successfully!");
-//        saleSystem.getPurchaseHistory().clear();
+
         pause();
     }
     private static void generateReports(ReportingService reportingService, DataExporter dataExporter) {
@@ -234,12 +239,21 @@ public class Director extends Window {
         String choice = scanner.nextLine();
 
         try {
+            BrandDB brandDB = new BrandDB();
+            brandDB.setBrandFromDB();
+
+            ProductDB productDB = new ProductDB();
+            productDB.setProductsFromDB(brandDB);
+
             switch (choice) {
                 case "1":
                     printStatus("Creating employee report...");
                     List<Map<String, Object>> employeeReport = reportingService.employeeReportWithPosition();
-                    dataExporter.exportEmployeeReport(employeeReport, "employee_report.csv");
-                    printSuccess("Employee report generated: employee_report.csv");
+                    String employeeFileName = "employee_report_" +
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
+
+                    dataExporter.exportEmployeeReport(employeeReport, employeeFileName);
+                    printSuccess("Employee report generated: " + employeeFileName);
                     break;
                 case "2":
                     printStatus("Creating financial report...");
@@ -249,37 +263,49 @@ public class Director extends Window {
                     System.out.print("Enter end date (YYYY-MM-DD): ");
                     LocalDate endDate = LocalDate.parse(scanner.nextLine());
                     List<Map<String, Object>> financialReport = reportingService.generateFinancialSummary(startDate, endDate);
-                    dataExporter.exportFinancialSummary(financialReport, "financial_report.csv");
-                    printSuccess("Financial report generated: financial_report.csv");
+                    String financialFileName = "financial_report_" +
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
+
+                    dataExporter.exportFinancialSummary(financialReport, financialFileName);
+                    printSuccess("Financial report generated: " + financialFileName);
                     break;
                 case "3":
                     printStatus("Creating product report...");
-                    List<Map<String, Object>> productReport = reportingService.generateProductReport();
-                    dataExporter.exportProductReport(productReport, "product_report.csv");
-                    printSuccess("Product report generated: product_report.csv");
+                    List<Map<String, Object>> productReport = reportingService.generateProductReport(productDB, brandDB);
+                    String fileName = "product_report_" +
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
+
+                    dataExporter.exportProductReport(productReport, fileName);
+                    printSuccess("Product report generated:"+ fileName);
                     break;
                 case "4":
                     printStatus("Creating employee report...");
                     List<Map<String, Object>> empReport = reportingService.employeeReportWithPosition();
-                    dataExporter.exportEmployeeReport(empReport, "employee_report.csv");
+                    String employeeFile = "employee_report_" +
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
+                    dataExporter.exportEmployeeReport(empReport, employeeFile);
 
                     printStatus("Creating financial report...");
                     System.out.print("Enter start date (YYYY-MM-DD): ");
-                    LocalDate StartDate = LocalDate.parse(scanner.nextLine());
+                    LocalDate startDateBatch = LocalDate.parse(scanner.nextLine());
                     System.out.print("Enter end date (YYYY-MM-DD): ");
-                    LocalDate EndDate = LocalDate.parse(scanner.nextLine());
-                    List<Map<String, Object>> finReport = reportingService.generateFinancialSummary(StartDate, EndDate);
-                    dataExporter.exportFinancialSummary(finReport, "financial_report.csv");
+                    LocalDate endDateBatch = LocalDate.parse(scanner.nextLine());
+                    List<Map<String, Object>> finReport = reportingService.generateFinancialSummary(startDateBatch, endDateBatch);
+                    String financialFile = "financial_report_" +
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
+                    dataExporter.exportFinancialSummary(finReport, financialFile);
 
                     printStatus("Creating product report...");
-                    List<Map<String, Object>> prodReport = reportingService.generateProductReport();
-                    dataExporter.exportProductReport(prodReport, "product_report.csv");
+                    List<Map<String, Object>> prodReport = reportingService.generateProductReport(productDB, brandDB);
+                    String productFile = "product_report_" +
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
+                    dataExporter.exportProductReport(prodReport, productFile);
 
                     printSuccess("All reports generated successfully!");
                     System.out.println(Colors.BOLD.get() + "Created files:" + Colors.RESET.get());
-                    System.out.println("• " + Colors.GREEN.get() + "employee_report.csv" + Colors.RESET.get());
-                    System.out.println("• " + Colors.GREEN.get() + "financial_report.csv" + Colors.RESET.get());
-                    System.out.println("• " + Colors.GREEN.get() + "product_report.csv" + Colors.RESET.get());
+                    System.out.println("• " + Colors.GREEN.get() + employeeFile + Colors.RESET.get());
+                    System.out.println("• " + Colors.GREEN.get() + financialFile + Colors.RESET.get());
+                    System.out.println("• " + Colors.GREEN.get() + productFile + Colors.RESET.get());
                     break;
                 default:
                     printError("Invalid choice. Please enter a number from 1 to 4.");

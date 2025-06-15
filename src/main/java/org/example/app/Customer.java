@@ -31,13 +31,9 @@ public class Customer extends Window{
                     break;
                 case 2:
                     purchaseProduct(products,sellers,salesystem,brands);
-                    System.out.println(Colors.YELLOW.get() + "Purchase functionality coming soon!" + Colors.RESET.get());
-                    pause();
                     break;
                 case 3:
                     leaveReview(products);
-                    System.out.println(Colors.YELLOW.get() + "Review functionality coming soon!" + Colors.RESET.get());
-                    pause();
                     break;
                 case 4:
                     viewProductReviews(products);
@@ -88,21 +84,21 @@ public class Customer extends Window{
 
         Brand brand = selectedProduct.getBrand();
         if (brand == null) {
-            System.out.println("⚠ У продукта не указан бренд!");
+            System.out.println("The product does not have a brand name.");
             pause();
             return;
         }
 
         List<Seller> experts = new ArrayList<>(brand.getExperts());
         if (experts.isEmpty()) {
-            System.out.println("⚠ Нет продавцов-экспертов для бренда: " + brand.getName());
+            System.out.println("No expert  for brand: " + brand.getName());
             pause();
             return;
         }
 
-        // Выбираем случайного подходящего продавца
+
         Seller selectedSeller = null;
-        Collections.shuffle(experts); // Перемешиваем список
+        Collections.shuffle(experts);
         for (Seller s : experts) {
             if (s.canSellNow()) {
                 selectedSeller = s;
@@ -111,12 +107,12 @@ public class Customer extends Window{
         }
 
         if (selectedSeller == null) {
-            System.out.println("⚠ Все продавцы достигли лимита продаж на текущий час. Попробуйте позже.");
+            System.out.println(" All sellers have reached their sales limit for the current hour. Please try again later.");
             pause();
             return;
         }
 
-        System.out.printf("💼 Selected Expert: %s (Rating: %.1f)\n", selectedSeller.getName(), selectedSeller.getRating());
+        System.out.printf(" Selected Expert: %s (Rating: %.1f)\n", selectedSeller.getName(), selectedSeller.getRating());
 
         System.out.print("Enter quantity to purchase: ");
         int quantity = getIntInput(1, selectedProduct.getQuantity());
@@ -127,8 +123,7 @@ public class Customer extends Window{
         saleSystem.processPurchase(selectedProduct, selectedSeller, quantity, buyerID);
         products.updateQuantityInDB(selectedProduct, selectedProduct.getQuantity());
 
-        // Логируем продажу у продавца
-        selectedSeller.recordSale(); // ➤ добавь этот метод в Seller
+        selectedSeller.recordSale();
 
         SellerDB.updateSellerStats(selectedSeller);
 
@@ -142,17 +137,17 @@ public class Customer extends Window{
             new BossDB().updateIncomeInDatabase();
         }
 
-        System.out.println("✅ Purchase completed successfully!");
+        System.out.println(" Purchase completed successfully!");
         System.out.print("Please rate the seller from 1 to 5: ");
         int rating = getIntInput(1, 5);
 
-// ➤ Просто вызываем метод
+
         selectedSeller.addRating(rating);
 
-// ➤ Обновляем в базе
+
         SellerDB.updateSellerRating(selectedSeller);
 
-        System.out.printf("✅ Seller's new average rating: %.2f\n", selectedSeller.getRating());
+        System.out.printf(" Seller's new average rating: %.2f\n", selectedSeller.getRating());
 
         pause();
     }
@@ -216,7 +211,7 @@ public class Customer extends Window{
             return;
         }
 
-        // Показываем продукты с их ID
+
         System.out.println(Colors.BOLD.get() + "Available Products:" + Colors.RESET.get());
         for (int i = 0; i < product.getProducts().size(); i++) {
             Product p = product.getProducts().get(i);
@@ -244,10 +239,10 @@ public class Customer extends Window{
                     .max()
                     .orElse(20);
 
-// Обмеження максимальної довжини коментаря
-            maxCommentLength = Math.min(maxCommentLength, 50); // Не більше 50 символів
 
-// Форматування таблиці
+            maxCommentLength = Math.min(maxCommentLength, 50);
+
+
             String separator = Colors.CYAN.get() + "+" + "-".repeat(9) + "+" + "-".repeat(22) + "+" +
                     "-".repeat(maxCommentLength + 2) + "+" + Colors.RESET.get();
             String headerFormat = Colors.CYAN.get() + "|" + Colors.PURPLE.get() + Colors.BOLD.get() + " %-7s " + Colors.CYAN.get() + "|" +
@@ -256,7 +251,7 @@ public class Customer extends Window{
             String rowFormat = Colors.CYAN.get() + "| " + Colors.YELLOW.get() + "%-7d " + Colors.CYAN.get() + "| " + Colors.GREEN.get() + "%-20s " +
                     Colors.CYAN.get() + "| " + Colors.RESET.get() + "%-" + maxCommentLength + "s " + Colors.CYAN.get() + "|" + Colors.RESET.get() + "\n";
 
-// Вивід таблиці
+
             System.out.println(separator);
             System.out.printf(headerFormat, "Rating", "Date", "Comment");
             System.out.println(separator);

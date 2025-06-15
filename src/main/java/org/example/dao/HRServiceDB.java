@@ -51,10 +51,10 @@ public class HRServiceDB {
             ps1.setString(1, name);
 
             try (ResultSet rs = ps1.executeQuery()) {
-                if (rs.next()) {  // Критично важливо!
+                if (rs.next()) {
                     return rs.getInt("id");
                 } else {
-                    throw new SQLException("Продавець не знайдений");
+                    throw new SQLException("The seller has no knowledge");
                 }
             }
         }

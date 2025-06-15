@@ -1,13 +1,15 @@
-package org.example.model;
+package org.example.dao;
 import org.example.database.Database;
+import org.example.model.Brand;
+import org.example.model.Product;
+import org.example.model.Seller;
 
-import javax.swing.*;
-import java.io.FileWriter;
 import java.time.LocalDate;
 import java.util.*;
 import java.sql.*;
 import java.time.LocalDateTime;
 public class ReportingService {
+
     public List<Map<String, Object>> employeeReportWithPosition() throws SQLException {
         List<Map<String, Object>> report = new ArrayList<>();
 
@@ -139,22 +141,40 @@ public class ReportingService {
     }
 
 
-    public List<Map<String, Object>> generateProductReport() throws SQLException {
+    public List<Map<String, Object>> generateProductReport(ProductDB productDB, BrandDB brandDB) {
         List<Map<String, Object>> report = new ArrayList<>();
-        String sql = "SELECT COUNT(*) AS total_products, AVG(price) AS avg_price, SUM(quantity) AS total_quantity FROM Products";
-        Connection conn = Database.getConnection();
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            if (rs.next()) {
-                Map<String, Object> productData = new LinkedHashMap<>();
-                productData.put("total_products", rs.getInt("total_products"));
-                productData.put("avg_price", rs.getDouble("avg_price"));
-                productData.put("total_quantity", rs.getInt("total_quantity"));
-                report.add(productData);
+
+        for (Product product : productDB.getProducts()) {
+            Map<String, Object> productData = new LinkedHashMap<>();
+            Brand brand = product.getBrand();
+
+            productData.put("product_id", product.getId());
+            productData.put("product_name", product.getName());
+            productData.put("price", product.getPrice());
+            productData.put("quantity", product.getQuantity());
+            productData.put("description", product.getDescription());
+
+            if (brand != null) {
+                productData.put("brand", brand.getName());
+                productData.put("department", brand.getDepartment() != null ? brand.getDepartment().getName() : "N/A");
+
+                List<String> expertNames = new ArrayList<>();
+                for (Seller expert : brand.getExperts()) {
+                    expertNames.add(expert.getName());
+                }
+                productData.put("experts", expertNames);
+            } else {
+                productData.put("brand", "Unknown");
+                productData.put("department", "Unknown");
+                productData.put("experts", Collections.emptyList());
             }
+
+            report.add(productData);
         }
+
         return report;
     }
+
 
     public List<Map<String, Object>> generateSalesReport(LocalDateTime from, LocalDateTime to) throws SQLException {
         List<Map<String, Object>> reportData = new ArrayList<>();

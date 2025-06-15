@@ -3,6 +3,7 @@ package org.example.dao;
 import org.example.model.Department;
 import org.example.database.Database;
 import org.example.model.Brand;
+import org.example.model.Seller;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -48,6 +49,38 @@ public class BrandDB {
         }
         return null;
     }
+
+    // BrandDB.java
+    public void assignExpertsToBrands(List<Seller> sellerList) {
+        List<Seller> assignedSellers = new ArrayList<>();
+
+        for (Brand brand : brands) {
+            int expertsAdded = 0;
+
+            for (Seller seller : sellerList) {
+                if (!assignedSellers.contains(seller) &&
+                        seller.getDepartment() != null &&
+                        brand.getDepartment() != null &&
+                        seller.getDepartment().getName().equals(brand.getDepartment().getName())) {
+
+                    brand.setExpert(seller);
+                    assignedSellers.add(seller);
+                    System.out.println(" Assigned " + seller.getName() + " to brand " + brand.getName());
+
+                    expertsAdded++;
+                    if (expertsAdded == 2) break;
+                }
+            }
+
+            if (expertsAdded == 0) {
+                System.out.println("No expert sellers found for brand: " + brand.getName());
+            }
+        }
+    }
+
+
+
+
 
     public static List<Brand> getBrands() {
         return brands;

@@ -92,4 +92,5 @@ public class SellerDB {
         stmt.executeUpdate();
         stmt.close();
     }
+
 }

@@ -2,7 +2,7 @@ package org.example.app;
 
 import org.example.model.DataExporter;
 import org.example.model.HR_Service;
-import org.example.model.ReportingService;
+import org.example.dao.ReportingService;
 import org.example.model.SaleSystem;
 import org.example.dao.*;
 import org.example.database.Database;
@@ -78,13 +78,13 @@ public class ShoppingCenter extends Window{
     private void initializeDatabase() throws SQLException {
         printStatus("Initializing database...");
         db.cleanDB();
-//        System.out.println("Deleted");
         db.initializationDB();
         System.out.println("Initialized allready database");
         department.setDepartmentsFromDB();
         manager.setManagersFromDB();
         seller.setSellersFromDB();
         brand.setBrandFromDB();
+        brand.assignExpertsToBrands(seller.getSellers());
         boss.setBossFromDB();
         product.setProductsFromDB(brand);
         printSuccess("The database is ready for use.");
