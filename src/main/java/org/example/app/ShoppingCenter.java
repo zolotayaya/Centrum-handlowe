@@ -58,7 +58,7 @@ public class ShoppingCenter extends Window{
 
             switch (choice) {
                 case 1:
-                    Customer.customerInterface(product);
+                    Customer.customerInterface(product,manager,seller,brand,saleSystem);
                     break;
                 case 2:
                     Director.directorInterface(manager,seller,product,brand,saleSystem,reportingService,dataExporter);

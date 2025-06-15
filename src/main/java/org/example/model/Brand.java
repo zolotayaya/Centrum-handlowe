@@ -8,7 +8,6 @@ public class Brand {
     private Department department;
     private List<Product> products;
 
-    //public Brand() {}
 
     public Brand(String name, Department department) {
         this.name = name;

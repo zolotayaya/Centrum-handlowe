@@ -4,8 +4,7 @@ import org.example.dao.PurchaseHistoryDB;
 import java.sql.SQLException;
 import java.util.*;
 public class PurchaseHistory {
-
-    private List<PurchaseRecord> purchases = new ArrayList<>();
+    private  List<PurchaseRecord> purchases = new ArrayList<>();
     private PurchaseHistoryDB purchaseHistoryDB = new PurchaseHistoryDB();
         public void addPurchase(PurchaseRecord record) throws SQLException {
             purchases.add(record);

@@ -60,11 +60,36 @@ public class SellerDB {
         }
     }
 
-    public List<Seller> getSellers() throws SQLException{
-        return sellers;
+    public static void updateSellerStats(Seller seller) throws SQLException {
+        String sql = "UPDATE Sellers SET salary = ?, salescount = ? WHERE id = ?";
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setFloat(1, seller.getIncome());
+        st.setInt(2, seller.getsalesCount());
+        st.setInt(3, seller.getId());
+        st.executeUpdate();
     }
+
+
     public static void updateSeller(Seller seller) throws SQLException{
         sellers.add(seller);
     }
+    public static List<Seller> getSellers() {
+        return sellers;
+    }
+    public static void deleteSellerById(int id) throws SQLException {
+        String sql = "DELETE FROM Sellers WHERE id = ?";
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setInt(1, id);
+        st.executeUpdate();
 
+        sellers.removeIf(s -> s.getId() == id);
+    }
+    public static void updateSellerRating(Seller seller) throws SQLException {
+        String sql = "UPDATE sellers SET rating = ? WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setDouble(1, seller.getRating());
+        stmt.setInt(2, seller.getId());
+        stmt.executeUpdate();
+        stmt.close();
+    }
 }

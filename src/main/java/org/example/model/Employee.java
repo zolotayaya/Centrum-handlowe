@@ -17,7 +17,6 @@ public Employee(int id,String name,Department department, float income,float com
         this.commision=commision;
         this.experience = experience ;
 }
-//public abstract void calculate();
 public abstract String showInformation();
 
 public Department setDepartment(String department){

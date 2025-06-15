@@ -37,7 +37,6 @@ public class Product {
             System.out.println("Not enough products in stock. Available: " + this.quantity);
             return false;
         }
-
         this.quantity -= quantity_sold;
         System.out.println("Sold " + quantity_sold + ". Available: " + this.quantity);
         return true;

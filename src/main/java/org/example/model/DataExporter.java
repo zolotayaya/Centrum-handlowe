@@ -6,27 +6,36 @@ import java.util.List;
 import java.util.Map;
 
 public class DataExporter {
+
     public void exportEmployeeReport(List<Map<String, Object>> data, String filePath) throws IOException {
         try (FileWriter writer = new FileWriter(filePath)) {
-            writer.append("Department,Position,Employee Count\n");
+            writer.append("ID,Name,Department,Income,Position\n");
             for (Map<String, Object> row : data) {
-                writer.append(row.get("department").toString()).append(",");
-                writer.append(row.get("position").toString()).append(",");
-                writer.append(row.get("employee_count").toString()).append("\n");
+                writer.append(String.valueOf(row.getOrDefault("id", ""))).append(",");
+                writer.append(String.valueOf(row.getOrDefault("name", ""))).append(",");
+                writer.append(String.valueOf(row.getOrDefault("department", ""))).append(",");
+                writer.append(String.valueOf(row.getOrDefault("income", ""))).append(",");
+                writer.append(String.valueOf(row.getOrDefault("position", ""))).append("\n");
             }
         }
     }
 
     public void exportFinancialSummary(List<Map<String, Object>> data, String filePath) throws IOException {
         try (FileWriter writer = new FileWriter(filePath)) {
-            writer.append("Role,Name,Income\n");
+
+            writer.append("Date,Product,Seller,Quantity,Price,Total\n");
+
             for (Map<String, Object> row : data) {
-                writer.append(row.getOrDefault("role", "").toString()).append(",");
-                writer.append(row.getOrDefault("name", "").toString()).append(",");
-                writer.append(row.getOrDefault("income", "").toString()).append("\n");
+                writer.append(row.getOrDefault("date", "").toString()).append(",");
+                writer.append(row.getOrDefault("product", "").toString()).append(",");
+                writer.append(row.getOrDefault("seller", "").toString()).append(",");
+                writer.append(row.getOrDefault("quantity", "").toString()).append(",");
+                writer.append(row.getOrDefault("price", "").toString()).append(",");
+                writer.append(row.getOrDefault("total", "").toString()).append("\n");
             }
         }
     }
+
 
     public void exportProductReport(List<Map<String, Object>> data, String filePath) throws IOException {
         try (FileWriter writer = new FileWriter(filePath)) {
@@ -50,6 +59,5 @@ public class DataExporter {
             }
         }
     }
-
     }
 

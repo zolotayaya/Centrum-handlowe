@@ -1,17 +1,18 @@
 package org.example.app;
 
-import org.example.dao.ReviewDB;
-import org.example.model.Review;
-import org.example.dao.ProductDB;
-import org.example.model.Product;
+import org.example.dao.*;
+import org.example.model.*;
+
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
 public class Customer extends Window{
 
-    public static void customerInterface(ProductDB products) throws SQLException {
+    public static void customerInterface(ProductDB products, ManagerDB managers, SellerDB sellers, BrandDB brands, SaleSystem salesystem) throws SQLException {
         while (true) {
             clearScreen();
             printHeader("Customer Portal");
@@ -29,7 +30,7 @@ public class Customer extends Window{
                     showProducts(products);
                     break;
                 case 2:
-                    // purchaseProduct() method to be implemented
+                    purchaseProduct(products,sellers,salesystem,brands);
                     System.out.println(Colors.YELLOW.get() + "Purchase functionality coming soon!" + Colors.RESET.get());
                     pause();
                     break;
@@ -69,6 +70,93 @@ public class Customer extends Window{
         if (str.length() <= maxLength) return str;
         return str.substring(0, maxLength-3) + "...";
     }
+    private static void purchaseProduct(ProductDB products, SellerDB sellers, SaleSystem saleSystem, BrandDB brands) throws SQLException {
+        clearScreen();
+        printHeader("Manual Purchase");
+
+        List<Product> productList = products.getProducts();
+
+        System.out.println("Available Products:");
+        for (int i = 0; i < productList.size(); i++) {
+            Product p = productList.get(i);
+            System.out.printf("%d. %s (Quantity: %d, Price: %.2f)\n", i + 1, p.getName(), p.getQuantity(), p.getPrice());
+        }
+
+        System.out.print("Select product index: ");
+        int productIndex = getIntInput(1, productList.size()) - 1;
+        Product selectedProduct = productList.get(productIndex);
+
+        Brand brand = selectedProduct.getBrand();
+        if (brand == null) {
+            System.out.println("⚠ У продукта не указан бренд!");
+            pause();
+            return;
+        }
+
+        List<Seller> experts = new ArrayList<>(brand.getExperts());
+        if (experts.isEmpty()) {
+            System.out.println("⚠ Нет продавцов-экспертов для бренда: " + brand.getName());
+            pause();
+            return;
+        }
+
+        // Выбираем случайного подходящего продавца
+        Seller selectedSeller = null;
+        Collections.shuffle(experts); // Перемешиваем список
+        for (Seller s : experts) {
+            if (s.canSellNow()) {
+                selectedSeller = s;
+                break;
+            }
+        }
+
+        if (selectedSeller == null) {
+            System.out.println("⚠ Все продавцы достигли лимита продаж на текущий час. Попробуйте позже.");
+            pause();
+            return;
+        }
+
+        System.out.printf("💼 Selected Expert: %s (Rating: %.1f)\n", selectedSeller.getName(), selectedSeller.getRating());
+
+        System.out.print("Enter quantity to purchase: ");
+        int quantity = getIntInput(1, selectedProduct.getQuantity());
+
+        System.out.print("Enter buyer ID: ");
+        int buyerID = getIntInput(1, 999999);
+
+        saleSystem.processPurchase(selectedProduct, selectedSeller, quantity, buyerID);
+        products.updateQuantityInDB(selectedProduct, selectedProduct.getQuantity());
+
+        // Логируем продажу у продавца
+        selectedSeller.recordSale(); // ➤ добавь этот метод в Seller
+
+        SellerDB.updateSellerStats(selectedSeller);
+
+        Manager manager = selectedSeller.getDepartment().getManager();
+        if (manager != null) {
+            ManagerDB.updateManagerIncome(manager);
+        }
+
+        Boss boss = BossDB.getBoss();
+        if (boss != null) {
+            new BossDB().updateIncomeInDatabase();
+        }
+
+        System.out.println("✅ Purchase completed successfully!");
+        System.out.print("Please rate the seller from 1 to 5: ");
+        int rating = getIntInput(1, 5);
+
+// ➤ Просто вызываем метод
+        selectedSeller.addRating(rating);
+
+// ➤ Обновляем в базе
+        SellerDB.updateSellerRating(selectedSeller);
+
+        System.out.printf("✅ Seller's new average rating: %.2f\n", selectedSeller.getRating());
+
+        pause();
+    }
+
 
     private static void leaveReview(ProductDB product) throws SQLException {
         Scanner scanner = new Scanner(System.in);
@@ -184,15 +272,6 @@ public class Customer extends Window{
                         formattedComment);
             }
             System.out.println(separator);
-//            printTableHeader(new String[]{"Rating", "Date", "Comment"});
-//            for (Review review : reviews) {
-//                printTableRow(new String[]{
-//                        String.valueOf(review.getRating()),
-//                        review.getDate(),
-//                        review.getComment()
-//                }, Colors.CYAN.get());
-//            }
-//        }
             pause();
         }
     }

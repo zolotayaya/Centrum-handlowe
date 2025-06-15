@@ -28,4 +28,7 @@ public class PurchaseRecord {
         return buyerID;
     }
     public float getPrice() {return price;}
+    public Seller getSeller() {
+        return seller;
+    }
 }
