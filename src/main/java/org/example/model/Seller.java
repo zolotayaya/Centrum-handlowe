@@ -17,13 +17,6 @@ public class Seller extends Employee implements IPromotable {
     private List<LocalDateTime> saleTimestamps = new ArrayList<>();
 
 
-    public void addToPromotionQueue() {
-    }
-
-    public float getAvarageRating() {
-        return 0;
-    }
-
     public Seller(int id, String name, Department department, float income, float commision, int salesCount, float rating,int experience) {
         super(id, name,department, income, commision,experience);
 
@@ -55,6 +48,8 @@ public class Seller extends Employee implements IPromotable {
                 manager.addIncome(totalPrice* (manager.getCommision()/100f));
             }
         }
+        Boss boss =Boss.getInstance();
+        boss.addIncome(totalPrice * 0.01f);
 
         if (checkPromotionCondition()) {
             executePromotion();

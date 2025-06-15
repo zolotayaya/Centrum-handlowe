@@ -13,7 +13,7 @@ public class Review {
     private final Timestamp date;
     private final String formattedDate;
 
-    // Constructor
+
     public Review(int productId, String productName, int rating, String comment, Timestamp date) {
         this.productId = productId;
         this.productName = productName;

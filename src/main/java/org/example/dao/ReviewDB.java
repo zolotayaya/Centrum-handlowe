@@ -47,7 +47,7 @@ public class ReviewDB {
         }
     }
     public List<Review> getReviewsByProductId(int productId) throws SQLException {
-//        List<Review> reviews = new ArrayList<>();
+
         String sql = "SELECT * FROM Reviews WHERE product_id = ? ORDER BY created_at DESC";
         Connection conn = Database.getConnection();
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {

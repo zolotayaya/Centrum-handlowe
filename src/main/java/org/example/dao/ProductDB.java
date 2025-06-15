@@ -33,8 +33,8 @@ public class ProductDB {
                 String brand = rs.getString("brand");
                 Brand brand1 = getBrand(brand, brandDB);
                 if (brand1 == null) {
-                    System.out.println("❌ Brand nie znaleziono: " + brand);
-                    continue; // albo throw new RuntimeException()
+                    System.out.println(" Brand nie znaleziono: " + brand);
+                    continue;
                 }
                 products.add(new Product(name, price, quantity, description, getBrand(brand, brandDB),id));
             }
