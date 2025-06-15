@@ -8,18 +8,15 @@ import java.sql.SQLException;
 import java.sql.SQLOutput;
 import java.util.*;
 public class HR_Service {
-//    public static Map<String,List<String>> quizQuetions;
     private static HRServiceDB service;
 
     public static boolean takeQuizDepartment() throws SQLException {
-//        quizQuetions = new HashMap<>();
         service = new HRServiceDB();
         service.initialiseQuize();
         Scanner scanner = new Scanner(System.in);
         int right_Ansers = 0;
         System.out.println(Colors.BOLD.get() + Colors.GREEN.get() + "Starting Quiz " + Colors.YELLOW.get() + "( odpowiedz 'TAK' lub 'NIE')");
         for(int i = 0; i<service.getQuestions().size(); i++){
-//            quizQuetions.put(service.getQuestions().get(i),service.getAnswers().get(i));
                 System.out.println(Colors.CYAN.get() + service.getQuestions().get(i));
                 String your_Answer = scanner.nextLine();
                 if (your_Answer.toLowerCase().equals(service.getAnswers().get(i))) {
@@ -35,15 +32,31 @@ public class HR_Service {
         }
     }
     public static String generateEmployeers(SellerDB sellers, DepartmentDB departments) throws SQLException {
-        Random random = new Random();
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter employeer name: ");
         String name = scanner.nextLine();
         System.out.println("Enter your experience years");
         int years = scanner.nextInt();
-        System.out.println("Select department: ");
         scanner.nextLine();
-        String department = scanner.nextLine();
+        boolean found = true;
+        String department = null;
+        while(found) {
+            System.out.println("Select department (Electronics, Clothes, Shoes, Cosmetics, Garden Tools): ");
+            String selectedDepartment = scanner.nextLine();
+            for (Department dept : departments.getDepartments()) {
+                if (selectedDepartment.equalsIgnoreCase(dept.getName())) {
+                    department = dept.getName();
+                    found = false;
+                    break;
+                }
+            }
+
+            if (found) {
+                System.out.println("Department not found. Please try again.");
+            } else {
+                System.out.println("Selected department: " + department);
+            }
+        }
         int id_employee = service.create_Employee_In_DB(name,years,department);
         Seller seller = new Seller(id_employee,name,getDep(department,departments),0,10,0,0,years);
         SellerDB.updateSeller(seller);

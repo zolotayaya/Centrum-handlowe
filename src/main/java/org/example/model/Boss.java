@@ -1,5 +1,9 @@
 package org.example.model;
 
+import org.example.dao.BossDB;
+
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 public class Boss{
@@ -41,18 +45,12 @@ public class Boss{
         this.income += amount;
 //        BossDB.updateIncomeInDatabase();
     }
-public float getIncome() {
+    public float getIncome() {
         return income;
-}
-//    private void updateIncomeInDatabase() {
-//        try{
-//             PreparedStatement stmt = conn.prepareStatement("UPDATE Boss SET income = ? WHERE id = 1"));
-//            stmt.setFloat(1, income);
-//            stmt.executeUpdate();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    }
+    public float calculateCenterIncome(LocalDate startDate, LocalDate endDate) {
+        return new BossDB().CalculateTotalIncomeFromHistory( startDate, endDate);
+    }
 
     public float calculateCenterIncome() {
         float Total =this.income;
@@ -61,4 +59,18 @@ public float getIncome() {
         }
         return Total;
     }
+    public static Boss getInstance()  {
+        if (instance == null) {
+            try {
+                instance = BossDB.setBossFromDB(); // загрузи из базы
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return instance;
+    }
+    public String getName() {
+        return name;
+    }
+
 }

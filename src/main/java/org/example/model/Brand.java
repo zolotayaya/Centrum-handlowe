@@ -8,7 +8,6 @@ public class Brand {
     private Department department;
     private List<Product> products;
 
-    //public Brand() {}
 
     public Brand(String name, Department department) {
         this.name = name;
@@ -20,8 +19,6 @@ public class Brand {
     public void setExpert(Seller expert) {
         this.experts.add(expert);
     }
-
-//        System.out.println("Expert is set");
 
     public void addProduct(Product product) {
         products.add(product);
@@ -58,7 +55,6 @@ public class Brand {
     }
 
     public List<Seller> getExperts() {
-        System.out.println("Size" + experts.size());
         return experts;
     }
 }

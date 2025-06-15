@@ -1,11 +1,5 @@
 package org.example.app;
-import org.example.model.Product;
-
-import java.util.*;
 import java.util.Scanner;
-
-import static java.awt.Color.RED;
-import static java.awt.Font.BOLD;
 
 public abstract class Window {
     private static final String RESET = "\u001B[0m";

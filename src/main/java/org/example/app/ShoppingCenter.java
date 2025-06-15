@@ -1,6 +1,6 @@
 package org.example.app;
 
-import org.example.DataExporter;
+import org.example.model.DataExporter;
 import org.example.model.HR_Service;
 import org.example.model.ReportingService;
 import org.example.model.SaleSystem;
@@ -54,11 +54,11 @@ public class ShoppingCenter extends Window{
             System.out.println(Colors.BOLD.get() + Colors.RED.get() + "4." + Colors.RESET.get() + " Exit System");
             System.out.print(Colors.BOLD.get() + "Select your role: " + Colors.RESET.get());
 
-            int choice = getIntInput(1, 3);
+            int choice = getIntInput(1, 4);
 
             switch (choice) {
                 case 1:
-                    Customer.customerInterface(product);
+                    Customer.customerInterface(product,manager,seller,brand,saleSystem);
                     break;
                 case 2:
                     Director.directorInterface(manager,seller,product,brand,saleSystem,reportingService,dataExporter);

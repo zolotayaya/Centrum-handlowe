@@ -1,6 +1,6 @@
 package org.example.app;
 
-import org.example.DataExporter;
+import org.example.model.DataExporter;
 import org.example.model.PurchaseHistory;
 import org.example.model.ReportingService;
 import org.example.model.SaleSystem;
@@ -14,10 +14,12 @@ import org.example.model.Product;
 import org.example.model.Seller;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 public class Director extends Window {
     private PurchaseHistory purchaseHistory;
+    private static int reportCounter = 1;  // Лічильник для унікальних імен файлів
     public static void directorInterface(ManagerDB managers, SellerDB sellers, ProductDB products, BrandDB brands, SaleSystem salesystem, ReportingService reportingService, DataExporter dataExporter) throws SQLException {
         // This is your original main menu functionality
         while (true) {
@@ -94,6 +96,7 @@ public class Director extends Window {
 
         printTableHeader(new String[]{"Name", "Brand", "Department", "Price", "Quantity", "Description"});
         for (Product product : products.getProducts()) {
+            System.out.println("Product ID:" + product.getId());
             printTableRow(new String[]{
                     product.getName(),
                     product.getBrand().getName(),
@@ -168,10 +171,10 @@ public class Director extends Window {
 
         sellers.setExperience(minExp, maxExp);
         System.out.println("Experience setted");
-List<Brand> brandList = brands.getBrands();
+        List<Brand> brandList = brands.getBrands();
         System.out.println("Brands setted");
-List<Seller> sellerList = sellers.getSellers();
-System.out.println("Sellers setted");
+        List<Seller> sellerList = sellers.getSellers();
+        System.out.println("Sellers setted");
         Set<Seller> assignedSellers = new HashSet<>();
 
         printStatus("Start of sales simulation..");
@@ -184,25 +187,22 @@ System.out.println("Sellers setted");
 
                     brand.setExpert(seller);
                     assignedSellers.add(seller);
-                    System.out.println("Assigned " + seller.getName() + " to " + brand.getName());
                     break;
                 }
             }
         }
+        PurchaseHistory purchaseHistory = new PurchaseHistory();
         for (int w = 0; w < weeks; w++) {
             for (int d = 0; d < days; d++) {
                 for (int h = 0; h < hours; h++) {
                     Product randomProduct = products.getProducts().get((int)(Math.random() * products.getProducts().size()));
                     Brand brand = randomProduct.getBrand();
-                    System.out.println("Brand name: " + brand.getName());
                     List<Seller> experts = brand.getExperts();
-                    System.out.println("Experts size: " + experts.size());
                     if(experts == null || experts.isEmpty()) {
                         printError("Error");
                         return;
                     }
-                         Seller seller = experts.get((int) (Math.random() * experts.size()));
-
+                    Seller seller = experts.get((int) (Math.random() * experts.size()));
                     saleSystem.processPurchase(randomProduct, seller, 1, 1);
                     products.updateQuantityInDB(randomProduct, randomProduct.getQuantity());
 
@@ -217,36 +217,78 @@ System.out.println("Sellers setted");
         }
 
         printSuccess("Simulation completed successfully!");
+//        saleSystem.getPurchaseHistory().clear();
         pause();
     }
-
     private static void generateReports(ReportingService reportingService, DataExporter dataExporter) {
         clearScreen();
-        printHeader("Generating reports");
+        printHeader("Select Report to Generate");
+
+        System.out.println("1. Employee Report");
+        System.out.println("2. Financial Report");
+        System.out.println("3. Product Report");
+        System.out.println("4. All Reports");
+        System.out.print("\nEnter your choice (1-4): ");
+
+        Scanner scanner = new Scanner(System.in);
+        String choice = scanner.nextLine();
 
         try {
-            printStatus("Creating a report on employees...");
-            List<Map<String, Object>> employeeReport = reportingService.employeeReportWithPosition();
-            dataExporter.exportEmployeeReport(employeeReport, "employee_report.csv");
+            switch (choice) {
+                case "1":
+                    printStatus("Creating employee report...");
+                    List<Map<String, Object>> employeeReport = reportingService.employeeReportWithPosition();
+                    dataExporter.exportEmployeeReport(employeeReport, "employee_report.csv");
+                    printSuccess("Employee report generated: employee_report.csv");
+                    break;
+                case "2":
+                    printStatus("Creating financial report...");
 
-            printStatus("Creating a financial report...");
-            List<Map<String, Object>> financialReport = reportingService.generateFinancialSummary();
-            dataExporter.exportFinancialSummary(financialReport, "financial_report.csv");
+                    System.out.print("Enter start date (YYYY-MM-DD): ");
+                    LocalDate startDate = LocalDate.parse(scanner.nextLine());
+                    System.out.print("Enter end date (YYYY-MM-DD): ");
+                    LocalDate endDate = LocalDate.parse(scanner.nextLine());
+                    List<Map<String, Object>> financialReport = reportingService.generateFinancialSummary(startDate, endDate);
+                    dataExporter.exportFinancialSummary(financialReport, "financial_report.csv");
+                    printSuccess("Financial report generated: financial_report.csv");
+                    break;
+                case "3":
+                    printStatus("Creating product report...");
+                    List<Map<String, Object>> productReport = reportingService.generateProductReport();
+                    dataExporter.exportProductReport(productReport, "product_report.csv");
+                    printSuccess("Product report generated: product_report.csv");
+                    break;
+                case "4":
+                    printStatus("Creating employee report...");
+                    List<Map<String, Object>> empReport = reportingService.employeeReportWithPosition();
+                    dataExporter.exportEmployeeReport(empReport, "employee_report.csv");
 
-            printStatus("Creating a product report...");
-            List<Map<String, Object>> productReport = reportingService.generateProductReport();
-            dataExporter.exportProductReport(productReport, "product_report.csv");
+                    printStatus("Creating financial report...");
+                    System.out.print("Enter start date (YYYY-MM-DD): ");
+                    LocalDate StartDate = LocalDate.parse(scanner.nextLine());
+                    System.out.print("Enter end date (YYYY-MM-DD): ");
+                    LocalDate EndDate = LocalDate.parse(scanner.nextLine());
+                    List<Map<String, Object>> finReport = reportingService.generateFinancialSummary(StartDate, EndDate);
+                    dataExporter.exportFinancialSummary(finReport, "financial_report.csv");
 
-            printSuccess("All reports generated successfully!");
-            System.out.println(Colors.BOLD.get() + "Created files:" + Colors.RESET.get());
-            System.out.println("• " + Colors.GREEN.get() + "employee_report.csv" + Colors.RESET.get());
-            System.out.println("• " +Colors.GREEN.get() + "financial_report.csv" + Colors.RESET.get());
-            System.out.println("• " + Colors.GREEN.get() + "product_report.csv" + Colors.RESET.get());
+                    printStatus("Creating product report...");
+                    List<Map<String, Object>> prodReport = reportingService.generateProductReport();
+                    dataExporter.exportProductReport(prodReport, "product_report.csv");
+
+                    printSuccess("All reports generated successfully!");
+                    System.out.println(Colors.BOLD.get() + "Created files:" + Colors.RESET.get());
+                    System.out.println("• " + Colors.GREEN.get() + "employee_report.csv" + Colors.RESET.get());
+                    System.out.println("• " + Colors.GREEN.get() + "financial_report.csv" + Colors.RESET.get());
+                    System.out.println("• " + Colors.GREEN.get() + "product_report.csv" + Colors.RESET.get());
+                    break;
+                default:
+                    printError("Invalid choice. Please enter a number from 1 to 4.");
+            }
         } catch (Exception e) {
-            printError("Error when generating reports: " + e.getMessage());
+            printError("Error generating reports: " + e.getMessage());
+            e.printStackTrace();
         }
 
         pause();
     }
-
 }

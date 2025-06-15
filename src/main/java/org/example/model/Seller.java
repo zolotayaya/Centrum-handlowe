@@ -1,12 +1,20 @@
 package org.example.model;
 
 import org.example.IPromotable;
+import org.example.dao.ManagerDB;
+import org.example.dao.SellerDB;
+
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Seller extends Employee implements IPromotable {
     private int salesCount;
     private Brand brand;
-    private final float rating;
+    private double rating;
     private Manager promotedTo;
+    private List<LocalDateTime> saleTimestamps = new ArrayList<>();
 
 
     public void addToPromotionQueue() {
@@ -35,6 +43,7 @@ public class Seller extends Employee implements IPromotable {
             return;
         }
         float totalPrice= product.getPrice()*quantity;
+        System.out.println("Solded :" + product.getName());
         product.updateQuantity(quantity);
         salesCount += 1;
         income+= totalPrice * (getCommision()/100f);
@@ -46,8 +55,6 @@ public class Seller extends Employee implements IPromotable {
                 manager.addIncome(totalPrice* (manager.getCommision()/100f));
             }
         }
-//        Boss boss =Boss.getInstance();
-//        boss.addIncome(totalPrice * 0.01f);
 
         if (checkPromotionCondition()) {
             executePromotion();
@@ -86,16 +93,29 @@ public class Seller extends Employee implements IPromotable {
         Manager oldManager = department.getManager();
         if (oldManager != null) {
             department.fireManager();
+            try {
+                ManagerDB.deleteManagerById(oldManager.getId());
+                System.out.println("Old manager removed from DB.");
+            } catch (SQLException e) {
+                System.err.println("Failed to delete old manager: " + e.getMessage());
+            }
         }
 
 
-        Manager newManager = new Manager(getId(), getName(), department, getIncome(), getCommision(),getExperience());
+        Manager newManager = new Manager(getId(), getName(), department, getIncome(), getCommision(), getExperience());
 
         department.removeEmployee(this);
         department.addEmployee(newManager);
         this.promotedTo = newManager;
 
         System.out.println(getName() + " Was promoted to manager!");
+        try {
+            ManagerDB.insertManager(newManager);
+            SellerDB.deleteSellerById(getId());
+            System.out.println("Promotion persisted to DB.");
+        } catch (SQLException e) {
+            System.err.println("Failed to update database: " + e.getMessage());
+        }
 
     }
 
@@ -110,6 +130,25 @@ public class Seller extends Employee implements IPromotable {
         }
         this.brand = brand;
     }
+    public boolean canSellNow() {
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+        long recentSales = saleTimestamps.stream()
+                .filter(t -> t.isAfter(oneHourAgo))
+                .count();
+        int limit = (int) Math.max(1, Math.round(getRating())); // Рейтинг 2.8 → 3, и т.п.
+        return recentSales < limit;
+    }
+    public void recordSale() {
+        saleTimestamps.add(LocalDateTime.now());
+    }
+
+
+    public void addRating(int newRating) {
+        this.rating = (this.rating + newRating) / 2.0;
+    }
+
+
+
 
     public Brand getBrand() {
         return brand;
@@ -118,15 +157,14 @@ public class Seller extends Employee implements IPromotable {
     public int getsalesCount() {
         return  salesCount;
     }
-    public Manager getPromotedTo() {
-        return promotedTo;
-    }
+
     @Override
     public float getIncome(){
         return income;
     }
 
-    public float getRating(){
+    public double getRating(){
         return rating;
     }
+
 }

@@ -25,6 +25,7 @@ public class ProductDB {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
+                int id = rs.getInt("id");
                 String name = rs.getString("name");
                 float price = rs.getFloat("price");
                 int quantity = rs.getInt("quantity");
@@ -35,7 +36,7 @@ public class ProductDB {
                     System.out.println("❌ Brand nie znaleziono: " + brand);
                     continue; // albo throw new RuntimeException()
                 }
-                products.add(new Product(name, price, quantity, description, getBrand(brand, brandDB)));
+                products.add(new Product(name, price, quantity, description, getBrand(brand, brandDB),id));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

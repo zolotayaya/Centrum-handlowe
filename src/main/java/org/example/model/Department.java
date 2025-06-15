@@ -38,10 +38,9 @@ public class Department {
         this.manager=manager;
         if(!employees.contains(manager)) {
             employees.add(manager);
-//            System.out.println("New manager is set");
         }
-//        this.manager=manager;
-//        System.out.print("New manager is set");
+       this.manager=manager;
+        System.out.print("New manager is set");
     }
 
     public boolean addEmployee(Employee employee) {

@@ -40,3 +40,6 @@ build/
 build
 out
 .idea
+.gradle/
+.gradle/
+.idea/

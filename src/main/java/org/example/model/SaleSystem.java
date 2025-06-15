@@ -8,21 +8,20 @@ public class SaleSystem {
         this.purchaseHistory =new PurchaseHistory();
     }
 
-        public PurchaseRecord processPurchase(Product product, Seller seller, int quantity, int buyerID) throws SQLException {
+        public void processPurchase(Product product, Seller seller, int quantity, int buyerID) throws SQLException {
             if (product.getQuantity() < quantity) {
                 System.out.println("Not enough product.");
-                return null;
+//                return null;
             }
             seller.saleProduct(product, quantity);
             PurchaseRecord record = new PurchaseRecord(product, seller,quantity, buyerID);
-            System.out.println("Purchase recor added");
             purchaseHistory.addPurchase(record);  // Zwiazek z PurchaseHistory
-            System.out.println("Purchase hisstory updated");
             System.out.println("The sale ended succsesful!");
-            return record;
+//            return record;
         }
         public PurchaseHistory getPurchaseHistory() {
         return purchaseHistory;
         }
+
     }
 
