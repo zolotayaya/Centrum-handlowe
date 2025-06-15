@@ -65,7 +65,9 @@ public class BrandDB {
 
                     brand.setExpert(seller);
                     assignedSellers.add(seller);
-                    //System.out.println(" Assigned " + seller.getName() + " to brand " + brand.getName());
+
+                    System.out.println(" Assigned " + seller.getName() + " to brand " + brand.getName());
+                  //System.out.println(" Assigned " + seller.getName() + " to brand " + brand.getName());
 
                     expertsAdded++;
                     if (expertsAdded == 2) break;
