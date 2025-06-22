@@ -75,7 +75,7 @@ public class ShoppingCenter extends Window{
         }
     }
 
-    private void initializeDatabase() throws SQLException {
+    public void initializeDatabase() throws SQLException {
         printStatus("Initializing database...");
         db.cleanDB();
         db.initializationDB();

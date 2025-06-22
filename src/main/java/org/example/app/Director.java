@@ -1,5 +1,4 @@
 package org.example.app;
-
 import org.example.dao.*;
 import org.example.model.*;
 
@@ -14,6 +13,7 @@ public class Director extends Window {
     private static int reportCounter = 1;  // Лічильник для унікальних імен файлів
     public static void directorInterface(ManagerDB managers, SellerDB sellers, ProductDB products, BrandDB brands, SaleSystem salesystem, ReportingService reportingService, DataExporter dataExporter) throws SQLException {
         // This is your original main menu functionality
+//        DirectorMethods directorMethods = new DirectorMethods(managers, sellers,products, brands, salesystem, reportingService, dataExporter);
         while (true) {
             clearScreen();
             printHeader("Director Management Portal");
@@ -26,29 +26,28 @@ public class Director extends Window {
             System.out.print(Colors.BOLD.get() + "Select action: " + Colors.RESET.get());
 
             int choice = getIntInput(1, 6);
-
             switch (choice) {
                 case 1:
-                    showEmployees(managers, sellers);
+                    Director.showEmployees(managers, sellers);
                     break;
                 case 2:
-                    showProducts(products);
+                    Director.showProducts(products);
                     break;
                 case 3:
-                    showBrands(brands);
+                    Director.showBrands(brands);
                     break;
                 case 4:
-                    simulateSales(products,sellers,salesystem,brands);
+                    Director.simulateSales(products,sellers,salesystem,brands);
                     break;
                 case 5:
-                    generateReports(reportingService,dataExporter);
+                    Director.generateReports(reportingService,dataExporter);
                     break;
                 case 6:
                     return;
             }
         }
     }
-    private static void showEmployees(ManagerDB managers, SellerDB sellers) throws SQLException {
+    public static void showEmployees(ManagerDB managers, SellerDB sellers) throws SQLException {
         clearScreen();
         printHeader("List of employees");
 
@@ -82,7 +81,7 @@ public class Director extends Window {
         pause();
     }
 
-    private static void showProducts(ProductDB products) throws SQLException {
+   public static void showProducts(ProductDB products) throws SQLException {
         clearScreen();
         printHeader("Products");
 
@@ -107,7 +106,7 @@ public class Director extends Window {
         return str.substring(0, maxLength-3) + "...";
     }
 
-    private static void showBrands(BrandDB brands) {
+    public static void showBrands(BrandDB brands) {
         clearScreen();
         printHeader("Brands");
 
@@ -142,7 +141,7 @@ public class Director extends Window {
         pause();
     }
 
-    private static void simulateSales(ProductDB products,SellerDB sellers, SaleSystem saleSystem,BrandDB brands) throws SQLException {
+    public static void simulateSales(ProductDB products, SellerDB sellers, SaleSystem saleSystem, BrandDB brands) throws SQLException {
         clearScreen();
         printHeader("Sales simulation");
 
@@ -183,7 +182,7 @@ public class Director extends Window {
                 }
             }
         }
-        PurchaseHistory purchaseHistory = new PurchaseHistory();
+//        PurchaseHistory purchaseHistory = new PurchaseHistory();
         for (int w = 0; w < weeks; w++) {
             for (int d = 0; d < days; d++) {
                 for (int h = 0; h < hours; h++) {
@@ -225,7 +224,7 @@ public class Director extends Window {
 
         pause();
     }
-    private static void generateReports(ReportingService reportingService, DataExporter dataExporter) {
+    public static void generateReports(ReportingService reportingService, DataExporter dataExporter) {
         clearScreen();
         printHeader("Select Report to Generate");
 
@@ -276,7 +275,7 @@ public class Director extends Window {
                             LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
 
                     dataExporter.exportProductReport(productReport, fileName);
-                    printSuccess("Product report generated:"+ fileName);
+                    printSuccess("Product report generated:" + fileName);
                     break;
                 case "4":
                     printStatus("Creating employee report...");

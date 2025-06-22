@@ -71,12 +71,12 @@ public class Seller extends Employee implements IPromotable {
     }
 
     @Override
-    public void executePromotion() {
+    public boolean executePromotion() {
         //System.out.println("executePromotion called");
         //System.out.println("Sales count: " + salesCount);
         //System.out.println("Promotion condition: " + checkPromotionCondition());
         Department department = getDepartment();
-        if (department == null) return;
+        if (department == null) return false;
         System.out.print("Error1");
 
         if (brand != null) {
@@ -111,7 +111,7 @@ public class Seller extends Employee implements IPromotable {
         } catch (SQLException e) {
             System.err.println("Failed to update database: " + e.getMessage());
         }
-
+        return true;
     }
 
     @Override

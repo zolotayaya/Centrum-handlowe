@@ -1,4 +1,5 @@
 package org.example.app;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public abstract class Window {
@@ -11,10 +12,13 @@ public abstract class Window {
     private static final String CYAN = "\u001B[36m";
     private static final String BOLD = "\u001B[1m";
     private static Scanner scanner = new Scanner(System.in);
-
+    private static boolean testMode = false;
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
+    }
+    public static void setScanner(Scanner scanner1) {
+        scanner = scanner1;
     }
 
     public static int getIntInput(int min, int max) {
@@ -26,18 +30,44 @@ public abstract class Window {
                     return input;
                 }
                 System.out.println(RED + "Please enter a number from " + min + " to " + max + RESET);
-            } catch (Exception e) {
+            } catch (Exception  e) {
                 scanner.nextLine();
                 System.out.println(RED + "Invalid input. Please enter an integer.." + RESET);
             }
         }
     }
+//public static int getIntInput(int min, int max) {
+//    while (true) {
+//        String line = scanner.nextLine();
+//        try {
+//            int input = Integer.parseInt(line.trim());
+//            if (input >= min && input <= max) {
+//                return input;
+//            } else {
+//                System.out.println(RED + "Please enter a number from " + min + " to " + max + RESET);
+//            }
+//        } catch (NumberFormatException e) {
+//            System.out.println(RED + "Invalid input. Please enter an integer.." + RESET);
+//        }
+//    }
+//}
 
     public static void pause() {
-        System.out.println();
-        System.out.print(BOLD + "Press Enter to continue..." + RESET);
-        scanner.nextLine();
+        if (!testMode) {
+            System.out.println();
+            System.out.print(BOLD + "Press Enter to continue..." + RESET);
+            scanner.nextLine();
+        }
     }
+
+    public static void setTestMode(boolean mode) {
+        testMode = mode;
+    }
+//    public static void pause() {
+//        System.out.println();
+//        System.out.print(BOLD + "Press Enter to continue..." + RESET);
+//        scanner.nextLine();
+//    }
 
     public static void printHeader(String text) {
         System.out.println(BOLD + PURPLE + "=== " + text + " ===" + RESET);

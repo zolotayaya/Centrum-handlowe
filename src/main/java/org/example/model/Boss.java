@@ -68,5 +68,4 @@ public class Boss{
     public String getName() {
         return name;
     }
-
 }
