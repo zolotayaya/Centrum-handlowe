@@ -16,10 +16,7 @@ public class Brand {
         this.experts = new ArrayList<>();
     }
 
-    //public void setExpert(Seller expert) {
-//        this.experts.add(expert);
-//    }
-    public void setExpert(Seller expert) {
+ public void setExpert(Seller expert) {
         if (!experts.contains(expert)) {
             experts.add(expert);
         }

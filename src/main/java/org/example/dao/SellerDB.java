@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 public class SellerDB {
+    private static SellerDB instance;
     private static List<Seller> sellers;
     private static Connection connection;
     public Random random;
@@ -19,6 +20,12 @@ public class SellerDB {
         sellers = new ArrayList<Seller>();
         this.connection = Database.getConnection();
         this.random = new Random();
+    }
+    public static synchronized SellerDB getInstance() {
+        if (instance == null) {
+            instance = new SellerDB();
+        }
+        return instance;
     }
 
     public void setSellersFromDB() throws SQLException {
@@ -70,10 +77,10 @@ public class SellerDB {
     }
 
 
-    public static void updateSeller(Seller seller) throws SQLException{
+    public  void updateSeller(Seller seller) throws SQLException{
         sellers.add(seller);
     }
-    public static List<Seller> getSellers() {
+    public  List<Seller> getSellers() {
         return sellers;
     }
     public static void deleteSellerById(int id) throws SQLException {

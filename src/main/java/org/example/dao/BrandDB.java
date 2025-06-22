@@ -80,11 +80,7 @@ public class BrandDB {
         }
     }
 
-
-
-
-
-    public static List<Brand> getBrands() {
+    public  List<Brand> getBrands() {
         return brands;
     }
 }

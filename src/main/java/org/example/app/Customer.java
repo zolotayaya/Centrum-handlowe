@@ -44,7 +44,7 @@ public class Customer extends Window{
         }
     }
 
-    private static void showProducts(ProductDB products) throws SQLException {
+    static void showProducts(ProductDB products) throws SQLException {
         clearScreen();
         printHeader("Products");
         printTableHeader(new String[]{"Name", "Brand", "Department", "Price", "Quantity", "Description"});
@@ -61,12 +61,12 @@ public class Customer extends Window{
         pause();
     }
 
-    private static String shortenString(String str, int maxLength) {
+    static String shortenString(String str, int maxLength) {
         if (str == null) return "";
         if (str.length() <= maxLength) return str;
         return str.substring(0, maxLength-3) + "...";
     }
-    private static void purchaseProduct(ProductDB products, SellerDB sellers, SaleSystem saleSystem, BrandDB brands) throws SQLException {
+    static void purchaseProduct(ProductDB products, SellerDB sellers, SaleSystem saleSystem, BrandDB brands) throws SQLException {
         clearScreen();
         printHeader("Manual Purchase");
 
@@ -153,7 +153,7 @@ public class Customer extends Window{
     }
 
 
-    private static void leaveReview(ProductDB product) throws SQLException {
+    static void leaveReview(ProductDB product) throws SQLException {
         Scanner scanner = new Scanner(System.in);
         clearScreen();
         printHeader("Leave Product Review");
@@ -201,7 +201,7 @@ public class Customer extends Window{
         }
     }
 
-    private static void viewProductReviews(ProductDB product) throws SQLException {
+    static void viewProductReviews(ProductDB product) throws SQLException {
         clearScreen();
         printHeader("Product Reviews");
 

@@ -58,8 +58,9 @@ public class HR_Service {
             }
         }
         int id_employee = service.create_Employee_In_DB(name,years,department);
+        SellerDB sellers_db = SellerDB.getInstance();
         Seller seller = new Seller(id_employee,name,getDep(department,departments),0,10,0,0,years);
-        SellerDB.updateSeller(seller);
+        sellers_db.updateSeller(seller);
         String message = "Employee " + name + " has been created";
         return message;
     }

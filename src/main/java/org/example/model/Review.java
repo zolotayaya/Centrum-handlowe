@@ -1,6 +1,5 @@
 package org.example.model;
 import org.example.dao.ReviewDB;
-import org.example.database.Database;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -10,7 +9,7 @@ public class Review {
     private final String productName;
     private final int rating;
     private final String comment;
-    private final Timestamp date;
+    private final Timestamp  date;
     private final String formattedDate;
 
 

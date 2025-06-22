@@ -56,7 +56,7 @@ public class ManagerDB {
     }
 
 
-    public List<Manager> getManagers() {
+    public  List<Manager> getManagers() {
         return managers;
     }
 
@@ -102,8 +102,8 @@ public class ManagerDB {
         PreparedStatement deleteStmt = connection.prepareStatement(deleteSellerSQL);
         deleteStmt.setInt(1, seller.getId());
         deleteStmt.executeUpdate();
-
-        SellerDB.getSellers().removeIf(s -> s.getId() == seller.getId());
+        SellerDB sellerDB = SellerDB.getInstance();
+        sellerDB.getSellers().removeIf(s -> s.getId() == seller.getId());
         System.out.println("Old seller " + seller.getName() + " removed from DB.");
     }
 
