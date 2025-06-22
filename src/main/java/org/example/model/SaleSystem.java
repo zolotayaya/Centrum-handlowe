@@ -8,20 +8,16 @@ public class SaleSystem {
         this.purchaseHistory =new PurchaseHistory();
     }
 
-        public void processPurchase(Product product, Seller seller, int quantity, int buyerID) throws SQLException {
+    public void processPurchase(Product product, Seller seller, int quantity, int buyerID) throws SQLException {
             if (product.getQuantity() < quantity) {
                 System.out.println("Not enough product.");
-
+                return;
             }
             seller.saleProduct(product, quantity);
             PurchaseRecord record = new PurchaseRecord(product, seller,quantity, buyerID);
             purchaseHistory.addPurchase(record);
 
             System.out.println("The sale ended succsesful!");
-
-            //System.out.println("The sale ended succsesful!");
-          
-
         }
         public PurchaseHistory getPurchaseHistory() {
         return purchaseHistory;
