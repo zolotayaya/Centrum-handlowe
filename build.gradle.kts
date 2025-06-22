@@ -8,7 +8,7 @@ version = "1.0-SNAPSHOT"
 
 dependencies {
     implementation("org.postgresql:postgresql:42.7.3")
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 }
 
 tasks.test {
