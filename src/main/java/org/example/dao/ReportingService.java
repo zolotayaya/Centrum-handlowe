@@ -8,8 +8,19 @@ import java.time.LocalDate;
 import java.util.*;
 import java.sql.*;
 import java.time.LocalDateTime;
+/**
+ * Klasa ReportingService odpowiada za generowanie różnych raportów dotyczących pracowników,
+ * finansów oraz produktów.
+ */
 public class ReportingService {
-
+    /**
+            * Generuje raport pracowników z podziałem na stanowiska (Sprzedawca, Manager) oraz departamenty.
+            * Raport zawiera szczegóły każdego pracownika oraz podsumowania na poziomie departamentu
+     * i łączną liczbę pracowników według stanowisk.
+            *
+            * @return lista map reprezentujących raport, gdzie każda mapa to jeden wiersz raportu
+     * @throws SQLException gdy wystąpi błąd podczas wykonywania zapytania do bazy danych
+     */
     public List<Map<String, Object>> employeeReportWithPosition() throws SQLException {
         List<Map<String, Object>> report = new ArrayList<>();
 
@@ -32,8 +43,8 @@ public class ReportingService {
                 String department = rs.getString("department");
                 String position = rs.getString("position");
 
+                // Jeśli zmienia się departament, dodajemy wiersz podsumowujący dla poprzedniego
                 if (!department.equals(currentDepartment) && currentDepartment != null) {
-
                     Map<String, Object> summaryRow = new LinkedHashMap<>();
                     summaryRow.put("id", "");
                     summaryRow.put("name", "");
@@ -45,6 +56,7 @@ public class ReportingService {
                     currentDepartmentCount = 0;
                 }
 
+                // Dodanie szczegółowego wiersza z danymi pracownika
                 Map<String, Object> row = new LinkedHashMap<>();
                 row.put("id", rs.getInt("id"));
                 row.put("name", rs.getString("name"));
@@ -53,7 +65,7 @@ public class ReportingService {
                 row.put("position", position);
                 report.add(row);
 
-
+                // Liczymy pracowników według stanowiska
                 if (position.equals("Seller")) sellerCount++;
                 else if (position.equals("Manager")) managerCount++;
 
@@ -61,7 +73,7 @@ public class ReportingService {
                 currentDepartmentCount++;
             }
 
-
+            // Dodajemy podsumowanie dla ostatniego departamentu
             if (currentDepartment != null) {
                 Map<String, Object> summaryRow = new LinkedHashMap<>();
                 summaryRow.put("id", "");
@@ -72,7 +84,7 @@ public class ReportingService {
                 report.add(summaryRow);
             }
 
-
+            // Dodajemy wiersz z sumarycznymi danymi o liczbie sprzedawców i managerów
             Map<String, Object> totalRow = new LinkedHashMap<>();
             totalRow.put("id", "");
             totalRow.put("name", "");
@@ -89,7 +101,14 @@ public class ReportingService {
         return report;
     }
 
-
+    /**
+     * Generuje podsumowanie finansowe na podstawie historii zakupów w określonym przedziale dat.
+     * Raport zawiera szczegóły poszczególnych zakupów oraz sumaryczne przychody za dany okres.
+     *
+     * @param startDate data początkowa zakresu (włącznie)
+     * @param endDate data końcowa zakresu (włącznie)
+     * @return lista map reprezentujących raport finansowy, gdzie każda mapa to jeden rekord zakupu lub podsumowanie
+     */
     public List<Map<String, Object>> generateFinancialSummary(LocalDate startDate, LocalDate endDate) {
         List<Map<String, Object>> report = new ArrayList<>();
         float totalIncome = 0f;
@@ -112,7 +131,7 @@ public class ReportingService {
 
                     Map<String, Object> purchase = new LinkedHashMap<>();
                     purchase.put("date", rs.getTimestamp("purchase_date").toLocalDateTime().toString());
-                    purchase.put("product",rs.getString("product_name"));
+                    purchase.put("product", rs.getString("product_name"));
                     purchase.put("seller", rs.getString("seller_name"));
                     purchase.put("quantity", quantity);
                     purchase.put("price", price);
@@ -123,7 +142,7 @@ public class ReportingService {
                 }
             }
 
-            // Add summary row
+            // Dodajemy wiersz podsumowujący łączne przychody
             Map<String, Object> totalRow = new LinkedHashMap<>();
             totalRow.put("date", "");
             totalRow.put("seller", "TOTAL INCOME");
@@ -140,7 +159,13 @@ public class ReportingService {
         return report;
     }
 
-
+    /**
+     * Generuje raport produktów wraz z informacjami o marce oraz ekspertach powiązanych z marką.
+     *
+     * @param productDB obiekt dostępu do danych produktów
+     * @param brandDB obiekt dostępu do danych marek
+     * @return lista map reprezentujących raport produktów, gdzie każda mapa zawiera dane jednego produktu
+     */
     public List<Map<String, Object>> generateProductReport(ProductDB productDB, BrandDB brandDB) {
         List<Map<String, Object>> report = new ArrayList<>();
 
@@ -175,33 +200,4 @@ public class ReportingService {
         return report;
     }
 
-
-    public List<Map<String, Object>> generateSalesReport(LocalDateTime from, LocalDateTime to) throws SQLException {
-        List<Map<String, Object>> reportData = new ArrayList<>();
-        String sql = "SELECT s.department, ph.product_name, SUM(ph.quantity) AS total_quantity, " +
-                "SUM(ph.price * ph.quantity) AS total_sales " +
-                "FROM purchase_history ph " +
-                "JOIN Seller s ON ph.seller_name = s.name " +
-                "WHERE ph.purchase_date BETWEEN ? AND ? " +
-                "GROUP BY s.department, ph.product_name " +
-                "ORDER BY s.department, total_sales DESC";
-        Connection conn = Database.getConnection();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setTimestamp(1, Timestamp.valueOf(from));
-            stmt.setTimestamp(2, Timestamp.valueOf(to));
-
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                Map<String, Object> row = new LinkedHashMap<>();
-                row.put("department", rs.getString("department"));
-                row.put("productName", rs.getString("product_name"));
-                row.put("quantitySold", rs.getInt("total_quantity"));
-                row.put("totalSales", rs.getDouble("total_sales"));
-                reportData.add(row);
-            }
-        }
-        return reportData;
-    }
 }

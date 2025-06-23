@@ -7,7 +7,12 @@ import java.sql.*;
 import java.util.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+/**
+ * Klasa do obsługi bazy danych aplikacji.
+ * Implementuje wzorzec Singleton zapewniający pojedyncze połączenie.
+ */
 public class Database {
+    // Listy do przechowywania obiektów aplikacji
     private List<Seller> sellers;
     private List<Manager> managers;
     private List<Brand> brands;
@@ -15,9 +20,12 @@ public class Database {
     private static List<Department> department;
     private List<Product> products;
     private List<PurchaseRecord> sales;
-    private static Connection conection;
-    private static Database instance;
+    private static Connection conection;// Połączenie z bazą danych
+    private static Database instance; // Singleton - jedna instancja klasy Database
 
+    /**
+     * Konstruktor klasy. Nawiązuje połączenie z bazą danych i inicjalizuje listy.
+     */
     public Database() {
         connection();
         sellers = new ArrayList<>();
@@ -28,6 +36,11 @@ public class Database {
         sales = new ArrayList<>();
     }
 
+    /**
+     * Zwraca pojedynczą instancję klasy Database.
+     *
+     * @return obiekt Database
+     */
         public static Database getInstance() {
             if(instance == null) {
                 instance = new Database();
@@ -35,6 +48,12 @@ public class Database {
             return instance;
         }
 
+    /**
+     * Ustanawia połączenie z bazą danych PostgreSQL.
+     * Parametry połączenia są na stałe wpisane w metodzie.
+     *
+     * @throws RuntimeException w przypadku błędu połączenia
+     */
     public  void connection() {
         String url = "jdbc:postgresql://localhost:5432/postgres";
         String user = "postgres";
@@ -47,6 +66,12 @@ public class Database {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Tworzy tabele w bazie danych oraz wstawia dane początkowe.
+     *
+     * @throws SQLException w przypadku błędów SQL
+     */
  public void initializationDB() throws SQLException {
         String sql_create_Sellers = "CREATE TABLE Sellers (\n" +
                 "    id INT GENERATED ALWAYS AS IDENTITY \n" +
@@ -414,7 +439,15 @@ public class Database {
      }
     }
 
-
+    /**
+     * Aktualizuje dane w bazie po dokonaniu zakupu.
+     * Aktualizuje ilość produktu, liczbę sprzedaży oraz dochody sprzedawcy, menedżera i szefa.
+     *
+     * @param product obiekt produktu z aktualną ilością
+     * @param seller obiekt sprzedawcy z aktualną liczbą sprzedaży i dochodem
+     * @param manager obiekt menedżera z aktualnym dochodem
+     * @throws SQLException w przypadku błędów aktualizacji danych
+     */
     public void updateDataBase(Product product, Seller seller, Manager manager) throws SQLException {
         String sql = "UPDATE Product SET quantity = ? WHERE name = ?";
         PreparedStatement st = conection.prepareStatement(sql);
@@ -441,6 +474,12 @@ public class Database {
         st3.executeUpdate();
     }
 
+    /**
+     * Usuwa wszystkie tabele z bazy danych, oczyszczając ją.
+     * Używa kasadowego usuwania zależnych obiektów.
+     *
+     * @throws SQLException w przypadku błędów podczas usuwania tabel
+     */
     public void cleanDB() throws SQLException {
 
         String[] tables = {
@@ -470,30 +509,65 @@ public class Database {
     }
 
 
+    /**
+     * Zwraca listę działów.
+     *
+     * @return lista obiektów Department
+     */
     public List<Department> getDepartments() {
         return department;
     }
 
+    /**
+     * Zwraca listę sprzedawców.
+     *
+     * @return lista obiektów Seller
+     */
     public List<Seller> getSellers() {
         return sellers;
     }
 
+    /**
+     * Zwraca listę menedżerów.
+     *
+     * @return lista obiektów Manager
+     */
     public List<Manager> getManagers() {
         return managers;
     }
 
-    public  List<Brand> getBrands() {
+    /**
+     * Zwraca listę marek.
+     *
+     * @return lista obiektów Brand
+     */
+    public List<Brand> getBrands() {
         return brands;
     }
 
+    /**
+     * Zwraca listę produktów.
+     *
+     * @return lista obiektów Product
+     */
     public List<Product> getProducts() {
         return products;
     }
 
-    public static Connection getConnection(){
+    /**
+     * Zwraca aktualne połączenie z bazą danych.
+     *
+     * @return obiekt Connection
+     */
+    public static Connection getConnection() {
         return conection;
     }
 
+    /**
+     * Zwraca bieżący obiekt Database.
+     *
+     * @return obiekt Database
+     */
     public  Database getDatabase(){
         return this;
     }

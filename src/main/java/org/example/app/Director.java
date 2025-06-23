@@ -7,13 +7,27 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
+/**
+ * Główna klasa interfejsu dyrektora — umożliwia zarządzanie pracownikami,
+ * produktami, markami oraz generowanie raportów.
+ */
 public class Director extends Window {
     private PurchaseHistory purchaseHistory;
-    private static int reportCounter = 1;  // Лічильник для унікальних імен файлів
+    private static int reportCounter = 1;  // Licznik unikalnych nazw plików
+    /**
+     * Wyświetla główne menu interfejsu dyrektora.
+     *
+     * @param managers          baza danych menedżerów
+     * @param sellers           baza danych sprzedawców
+     * @param products          baza danych produktów
+     * @param brands            baza danych marek
+     * @param salesystem        system sprzedaży
+     * @param reportingService  usługa generowania raportów
+     * @param dataExporter      moduł eksportu danych
+     * @throws SQLException w przypadku problemu z bazą danych
+     */
     public static void directorInterface(ManagerDB managers, SellerDB sellers, ProductDB products, BrandDB brands, SaleSystem salesystem, ReportingService reportingService, DataExporter dataExporter) throws SQLException {
-        // This is your original main menu functionality
-//        DirectorMethods directorMethods = new DirectorMethods(managers, sellers,products, brands, salesystem, reportingService, dataExporter);
+
         while (true) {
             clearScreen();
             printHeader("Director Management Portal");
@@ -47,6 +61,13 @@ public class Director extends Window {
             }
         }
     }
+    /**
+     * Wyświetla listę wszystkich pracowników (menedżerów i sprzedawców).
+     *
+     * @param managers baza danych menedżerów
+     * @param sellers  baza danych sprzedawców
+     * @throws SQLException w przypadku problemu z bazą danych
+     */
     public static void showEmployees(ManagerDB managers, SellerDB sellers) throws SQLException {
         clearScreen();
         printHeader("List of employees");
@@ -80,7 +101,12 @@ public class Director extends Window {
 
         pause();
     }
-
+    /**
+     * Wyświetla wszystkie produkty z informacjami szczegółowymi.
+     *
+     * @param products baza danych produktów
+     * @throws SQLException w przypadku problemu z bazą danych
+     */
    public static void showProducts(ProductDB products) throws SQLException {
         clearScreen();
         printHeader("Products");
@@ -99,13 +125,23 @@ public class Director extends Window {
         }
         pause();
     }
-
+    /**
+     * Skraca zbyt długi ciąg tekstowy do określonej długości.
+     *
+     * @param str       tekst wejściowy
+     * @param maxLength maksymalna długość
+     * @return skrócony tekst
+     */
     private static String shortenString(String str, int maxLength) {
         if (str == null) return "";
         if (str.length() <= maxLength) return str;
         return str.substring(0, maxLength-3) + "...";
     }
-
+    /**
+     * Wyświetla listę wszystkich marek i przypisanych do nich ekspertów oraz produktów.
+     *
+     * @param brands baza danych marek
+     */
     public static void showBrands(BrandDB brands) {
         clearScreen();
         printHeader("Brands");
@@ -140,7 +176,15 @@ public class Director extends Window {
 
         pause();
     }
-
+    /**
+     * Symuluje sprzedaż produktów przez losowych sprzedawców w wybranym przedziale czasowym.
+     *
+     * @param products   baza danych produktów
+     * @param sellers    baza danych sprzedawców
+     * @param saleSystem system sprzedaży
+     * @param brands     baza danych marek
+     * @throws SQLException w przypadku problemu z bazą danych
+     */
     public static void simulateSales(ProductDB products, SellerDB sellers, SaleSystem saleSystem, BrandDB brands) throws SQLException {
         clearScreen();
         printHeader("Sales simulation");
@@ -160,32 +204,18 @@ public class Director extends Window {
         System.out.print("Maximum sales experience: ");
         int maxExp = getIntInput(minExp, 50);
 
-        sellers.setExperience(minExp, maxExp);
-        //System.out.println("Experience setted");
-        List<Brand> brandList = brands.getBrands();
-        //System.out.println("Brands setted");
+        sellers.setExperience(minExp, maxExp);// Ustawianie doświadczenia sprzedawców na podstawie zakresu
+        List<Brand> brandList = brands.getBrands();// Pobranie listy marek i sprzedawców z bazy danych
         List<Seller> sellerList = sellers.getSellers();
-        //System.out.println("Sellers setted");
         Set<Seller> assignedSellers = new HashSet<>();
 
-        printStatus("Start of sales simulation..");
-        for(Brand brand : brandList) {
-            for (Seller seller : sellerList) {
-                if (!assignedSellers.contains(seller) &&
-                        seller.getDepartment() != null &&
-                        brand.getDepartment() != null &&
-                        seller.getDepartment().getName().equals(brand.getDepartment().getName())) {
 
-                    brand.setExpert(seller);
-                    assignedSellers.add(seller);
-                    break;
-                }
-            }
-        }
-//        PurchaseHistory purchaseHistory = new PurchaseHistory();
+        printStatus("Start of sales simulation..");
+        // Symulacja sprzedaży przez tygodnie, dni i godziny
         for (int w = 0; w < weeks; w++) {
             for (int d = 0; d < days; d++) {
                 for (int h = 0; h < hours; h++) {
+                    // Losowy wybór produktu
                     Product randomProduct = products.getProducts().get((int)(Math.random() * products.getProducts().size()));
                     Brand brand = randomProduct.getBrand();
                     List<Seller> experts = brand.getExperts();
@@ -193,19 +223,20 @@ public class Director extends Window {
                         printError("Error");
                         return;
                     }
+                    // Losowy wybór eksperta (sprzedawcy)
                     Seller seller = experts.get((int) (Math.random() * experts.size()));
-                    int maxPerPurchase = Math.min(randomProduct.getQuantity(), 10);
+                    int maxPerPurchase = Math.min(randomProduct.getQuantity(), 10);// Losowa ilość sprzedanych produktów (maksymalnie 10)
                     int randomQuantity = new Random().nextInt(maxPerPurchase) + 1;
-                    int randomId = new Random().nextInt(9000) + 1000; //  ID
-                    saleSystem.processPurchase(randomProduct, seller, randomQuantity, randomId);
+                    int randomId = new Random().nextInt(9000) + 1000; //  Losowy ID zakupu
+                    saleSystem.processPurchase(randomProduct, seller, randomQuantity, randomId);// Przetwarzanie zakupu
                     products.updateQuantityInDB(randomProduct, randomProduct.getQuantity());
-                    SellerDB.updateSellerStats(seller);
-                    Manager manager = seller.getDepartment().getManager();
+                    SellerDB.updateSellerStats(seller);// Aktualizacja statystyk sprzedawcy
+                    Manager manager = seller.getDepartment().getManager();// Aktualizacja dochodu menedżera działu
                     if (manager != null) {
                         ManagerDB.updateManagerIncome(manager);
                     }
 
-                    Boss boss = BossDB.getBoss();
+                    Boss boss = BossDB.getBoss();// Aktualizacja dochodu boss
                     if (boss != null) {
                         BossDB bossDB =new BossDB();
                         bossDB.updateIncomeInDatabase();
@@ -224,6 +255,12 @@ public class Director extends Window {
 
         pause();
     }
+    /**
+     * Generuje raporty: pracowniczy, finansowy, produktowy lub wszystkie jednocześnie.
+     *
+     * @param reportingService usługa generowania raportów
+     * @param dataExporter     moduł eksportu danych
+     */
     public static void generateReports(ReportingService reportingService, DataExporter dataExporter) {
         clearScreen();
         printHeader("Select Report to Generate");
@@ -246,7 +283,7 @@ public class Director extends Window {
 
             switch (choice) {
                 case "1":
-                    printStatus("Creating employee report...");
+                    printStatus("Creating employee report...");// Tworzenie raportu pracowniczego
                     List<Map<String, Object>> employeeReport = reportingService.employeeReportWithPosition();
                     String employeeFileName = "employee_report_" +
                             LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
@@ -255,7 +292,7 @@ public class Director extends Window {
                     printSuccess("Employee report generated: " + employeeFileName);
                     break;
                 case "2":
-                    printStatus("Creating financial report...");
+                    printStatus("Creating financial report..."); // Tworzenie raportu finansowego z podanym zakresem dat
 
                     System.out.print("Enter start date (YYYY-MM-DD): ");
                     LocalDate startDate = LocalDate.parse(scanner.nextLine());
@@ -269,7 +306,7 @@ public class Director extends Window {
                     printSuccess("Financial report generated: " + financialFileName);
                     break;
                 case "3":
-                    printStatus("Creating product report...");
+                    printStatus("Creating product report...");// Tworzenie raportu produktów
                     List<Map<String, Object>> productReport = reportingService.generateProductReport(productDB, brandDB);
                     String fileName = "product_report_" +
                             LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
@@ -278,7 +315,7 @@ public class Director extends Window {
                     printSuccess("Product report generated:" + fileName);
                     break;
                 case "4":
-                    printStatus("Creating employee report...");
+                    printStatus("Creating employee report...");// Tworzenie wszystkich raportów jednocześnie
                     List<Map<String, Object>> empReport = reportingService.employeeReportWithPosition();
                     String employeeFile = "employee_report_" +
                             LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";

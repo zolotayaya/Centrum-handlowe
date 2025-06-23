@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Testy jednostkowe klasy {@link PurchaseHistory}.
+ */
 public class PurchaseHistoryTest {
 
     private PurchaseHistory purchaseHistory;
@@ -12,6 +15,9 @@ public class PurchaseHistoryTest {
     private Department department;
     private PurchaseRecord record;
 
+    /**
+     * Przygotowuje przykładowe obiekty przed każdym testem.
+     */
     @BeforeEach
     void setUp() {
         department = new Department("Electronics");
@@ -22,10 +28,12 @@ public class PurchaseHistoryTest {
         record = new PurchaseRecord(product, seller, 1, 101);
     }
 
-
+    /**
+     * Testuje, czy metoda {@link PurchaseHistory#getAll()} zwraca pustą listę,
+     * gdy historia zakupów jest pusta.
+     */
     @Test
     void getAll_zwraca_pusta_Liste() {
         assertTrue(purchaseHistory.getAll().isEmpty());
     }
-
 }

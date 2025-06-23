@@ -7,10 +7,15 @@ import org.junit.jupiter.api.Test;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
-
-
+/**
+ * Testy jednostkowe klasy {@link Review}.
+ */
 public class ReviewTest {
 
+    /**
+     * Testuje, czy konstruktor klasy {@link Review} poprawnie inicjalizuje pola,
+     * a także czy data jest poprawnie formatowana na String.
+     */
     @Test
     void constructor_korektna_inicjalizacja_pol() {
         int productId = 101;
@@ -31,6 +36,11 @@ public class ReviewTest {
         assertEquals(expectedFormatted, review.getFormattedDate());
     }
 
+    /**
+     * Testuje, czy konstruktor klasy {@link Review} poprawnie obsługuje przypadek,
+     * gdy znacznik czasu {@code createdAt} jest {@code null},
+     * oraz czy metoda {@link Review#getFormattedDate()} zwraca "N/A".
+     */
     @Test
     void constructor_obsluga_znacznika_o_zerowym_Czasie() {
         Review review = new Review(1, "iPhone 15", 4, "Good!", null);

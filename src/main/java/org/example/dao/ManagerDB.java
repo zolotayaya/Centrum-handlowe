@@ -3,7 +3,6 @@ package org.example.dao;
 import org.example.model.Department;
 import org.example.database.Database;
 import org.example.model.Manager;
-import org.example.model.Seller;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,15 +11,31 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Klasa {@code ManagerDB} odpowiada za operacje bazodanowe dotyczące obiektów klasy {@link Manager}.
+ */
 public class ManagerDB {
+
+    /** Połączenie z bazą danych. */
     private static Connection connection;
+
+    /** Lista wszystkich managerów wczytanych z bazy danych. */
     public static List<Manager> managers;
 
+    /**
+     * Konstruktor inicjalizujący połączenie z bazą danych i listę managerów.
+     */
     public ManagerDB() {
         managers = new ArrayList<>();
         this.connection = Database.getConnection();
     }
 
+    /**
+     * Wczytuje wszystkich managerów z tabeli {@code Managers} w bazie danych
+     * i dodaje ich do lokalnej listy {@code managers}.
+     *
+     * @throws SQLException jeśli wystąpi błąd podczas komunikacji z bazą danych
+     */
     public void setManagersFromDB() throws SQLException {
         String sql = "SELECT * FROM Managers";
         PreparedStatement st = connection.prepareStatement(sql);
@@ -32,10 +47,17 @@ public class ManagerDB {
             float income = rs.getFloat("income");
             float commission = rs.getFloat("commission");
             int experience = rs.getInt("experience");
+
             managers.add(new Manager(id, name, getDep(depname), income, commission, experience));
         }
     }
 
+    /**
+     * Wyszukuje obiekt {@link Department} na podstawie jego nazwy.
+     *
+     * @param depName nazwa działu
+     * @return obiekt {@code Department}, jeśli znaleziono; w przeciwnym razie {@code null}
+     */
     public Department getDep(String depName) {
         List<Department> departments = DepartmentDB.getDepartments();
         if (depName == null) return null;
@@ -47,6 +69,12 @@ public class ManagerDB {
         return null;
     }
 
+    /**
+     * Aktualizuje dochód danego managera w bazie danych.
+     *
+     * @param manager obiekt {@code Manager}, którego dochód ma zostać zaktualizowany
+     * @throws SQLException jeśli wystąpi błąd podczas zapisu do bazy danych
+     */
     public static void updateManagerIncome(Manager manager) throws SQLException {
         String sql = "UPDATE Managers SET income = ? WHERE id = ?";
         PreparedStatement st = connection.prepareStatement(sql);
@@ -55,60 +83,23 @@ public class ManagerDB {
         st.executeUpdate();
     }
 
-
-    public  List<Manager> getManagers() {
+    /**
+     * Zwraca listę wszystkich managerów.
+     *
+     * @return lista obiektów {@code Manager}
+     */
+    public List<Manager> getManagers() {
         return managers;
     }
 
-    public static void promoteSellerToManager(Seller seller) throws SQLException {
-        Department department = seller.getDepartment();
-        if (department == null) return;
-
-        Manager oldManager = department.getManager();
-        if (oldManager != null) {
-            String deleteOldManagerSQL = "DELETE FROM Managers WHERE id = ?";
-            PreparedStatement delStmt = connection.prepareStatement(deleteOldManagerSQL);
-            delStmt.setInt(1, oldManager.getId());
-            delStmt.executeUpdate();
-
-            managers.removeIf(m -> m.getId() == oldManager.getId());
-            System.out.println("Old manager " + oldManager.getName() + " removed from DB.");
-        }
-
-        Manager newManager = new Manager(
-                seller.getId(),
-                seller.getName(),
-                department,
-                seller.getIncome(),
-                seller.getCommision(),
-                seller.getExperience()
-        );
-
-        String insertSQL = "INSERT INTO Managers (id, name, department, income, commission, experience) VALUES (?, ?, ?, ?, ?, ?)";
-        PreparedStatement insertStmt = connection.prepareStatement(insertSQL);
-        insertStmt.setInt(1, newManager.getId());
-        insertStmt.setString(2, newManager.getName());
-        insertStmt.setString(3, department.getName());
-        insertStmt.setFloat(4, newManager.getIncome());
-        insertStmt.setFloat(5, newManager.getCommision());
-        insertStmt.setInt(6, newManager.getExperience());
-        insertStmt.executeUpdate();
-
-        managers.add(newManager);
-        System.out.println("New manager " + newManager.getName() + " inserted into DB.");
-
-
-        String deleteSellerSQL = "DELETE FROM Sellers WHERE id = ?";
-        PreparedStatement deleteStmt = connection.prepareStatement(deleteSellerSQL);
-        deleteStmt.setInt(1, seller.getId());
-        deleteStmt.executeUpdate();
-        SellerDB sellerDB = SellerDB.getInstance();
-        sellerDB.getSellers().removeIf(s -> s.getId() == seller.getId());
-        System.out.println("Old seller " + seller.getName() + " removed from DB.");
-    }
-
+    /**
+     * Wstawia nowego managera do bazy danych oraz dodaje go do lokalnej listy {@code managers}.
+     *
+     * @param manager obiekt {@code Manager}, który ma zostać dodany
+     * @throws SQLException jeśli wystąpi błąd podczas dodawania do bazy danych
+     */
     public static void insertManager(Manager manager) throws SQLException {
-        String sql = "INSERT INTO Managers ( name, department, income, commission, experience) VALUES ( ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Managers (name, department, income, commission, experience) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement st = connection.prepareStatement(sql);
         st.setString(1, manager.getName());
         st.setString(2, manager.getDepartment().getName());
@@ -116,9 +107,16 @@ public class ManagerDB {
         st.setFloat(4, manager.getCommision());
         st.setInt(5, manager.getExperience());
         st.executeUpdate();
+
         managers.add(manager);
     }
 
+    /**
+     * Usuwa managera z bazy danych oraz z lokalnej listy {@code managers} na podstawie jego ID.
+     *
+     * @param id identyfikator managera do usunięcia
+     * @throws SQLException jeśli wystąpi błąd podczas usuwania z bazy danych
+     */
     public static void deleteManagerById(int id) throws SQLException {
         String sql = "DELETE FROM Managers WHERE id = ?";
         PreparedStatement stmt = connection.prepareStatement(sql);

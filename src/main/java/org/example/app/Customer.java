@@ -4,14 +4,31 @@ import org.example.dao.*;
 import org.example.model.*;
 
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
-public class Customer extends Window{
+/**
+ * Klasa {@code Customer} reprezentuje interfejs użytkownika dla klienta w systemie sprzedaży.
+ * <p>
+ * Umożliwia:
+ * <ul>
+ *     <li>Przeglądanie dostępnych produktów</li>
+ *     <li>Dokonywanie zakupów</li>
+ *     <li>Dodawanie i przeglądanie recenzji produktów</li>
+ * </ul>
+ * Dziedziczy po klasie {@code Window}, która obsługuje wyświetlanie UI w terminalu (np. nagłówki, czyszczenie ekranu).
+ */
+public class Customer extends Window {
 
+    /**
+     * Główne menu klienta. Obsługuje wybór opcji i wywołanie odpowiednich metod.
+     *
+     * @param products   baza danych produktów
+     * @param managers   baza danych menedżerów
+     * @param sellers    baza danych sprzedawców
+     * @param brands     baza danych marek
+     * @param salesystem system sprzedaży
+     * @throws SQLException w przypadku błędów bazy danych
+     */
     public static void customerInterface(ProductDB products, ManagerDB managers, SellerDB sellers, BrandDB brands, SaleSystem salesystem) throws SQLException {
         while (true) {
             clearScreen();
@@ -26,24 +43,21 @@ public class Customer extends Window{
             int choice = getIntInput(1, 5);
 
             switch (choice) {
-                case 1:
-                    showProducts(products);
-                    break;
-                case 2:
-                    purchaseProduct(products,sellers,salesystem,brands);
-                    break;
-                case 3:
-                    leaveReview(products);
-                    break;
-                case 4:
-                    viewProductReviews(products);
-                    break;
-                case 5:
-                    return;
+                case 1 -> showProducts(products);
+                case 2 -> purchaseProduct(products, sellers, salesystem, brands);
+                case 3 -> leaveReview(products);
+                case 4 -> viewProductReviews(products);
+                case 5 -> { return; }
             }
         }
     }
 
+    /**
+     * Wyświetla dostępne produkty w formie tabeli.
+     *
+     * @param products baza danych produktów
+     * @throws SQLException w przypadku błędów bazy danych
+     */
     static void showProducts(ProductDB products) throws SQLException {
         clearScreen();
         printHeader("Products");
@@ -61,11 +75,28 @@ public class Customer extends Window{
         pause();
     }
 
+    /**
+     * Skraca tekst do określonej długości, dodając "..." na końcu, jeśli tekst był dłuższy.
+     *
+     * @param str       oryginalny tekst
+     * @param maxLength maksymalna długość
+     * @return skrócony tekst
+     */
     static String shortenString(String str, int maxLength) {
         if (str == null) return "";
         if (str.length() <= maxLength) return str;
-        return str.substring(0, maxLength-3) + "...";
+        return str.substring(0, maxLength - 3) + "...";
     }
+
+    /**
+     * Obsługuje proces zakupu produktu przez klienta.
+     *
+     * @param products     baza danych produktów
+     * @param sellers      baza danych sprzedawców
+     * @param saleSystem   system sprzedaży
+     * @param brands       baza danych marek
+     * @throws SQLException w przypadku błędów bazy danych
+     */
     static void purchaseProduct(ProductDB products, SellerDB sellers, SaleSystem saleSystem, BrandDB brands) throws SQLException {
         clearScreen();
         printHeader("Manual Purchase");
@@ -96,7 +127,6 @@ public class Customer extends Window{
             return;
         }
 
-
         Seller selectedSeller = null;
         Collections.shuffle(experts);
         for (Seller s : experts) {
@@ -124,7 +154,6 @@ public class Customer extends Window{
         products.updateQuantityInDB(selectedProduct, selectedProduct.getQuantity());
 
         selectedSeller.recordSale();
-
         SellerDB.updateSellerStats(selectedSeller);
 
         Manager manager = selectedSeller.getDepartment().getManager();
@@ -141,18 +170,19 @@ public class Customer extends Window{
         System.out.print("Please rate the seller from 1 to 5: ");
         int rating = getIntInput(1, 5);
 
-
         selectedSeller.addRating(rating);
-
-
         SellerDB.updateSellerRating(selectedSeller);
-
         System.out.printf(" Seller's new average rating: %.2f\n", selectedSeller.getRating());
 
         pause();
     }
 
-
+    /**
+     * Umożliwia klientowi zostawienie recenzji dla wybranego produktu.
+     *
+     * @param product baza danych produktów
+     * @throws SQLException w przypadku błędów bazy danych
+     */
     static void leaveReview(ProductDB product) throws SQLException {
         Scanner scanner = new Scanner(System.in);
         clearScreen();
@@ -164,26 +194,34 @@ public class Customer extends Window{
             return;
         }
 
-        //Overwatch of products by ID
         System.out.println(Colors.BOLD.get() + "Available Products:" + Colors.RESET.get());
         for (int i = 0; i < product.getProducts().size(); i++) {
             Product p = product.getProducts().get(i);
             System.out.printf("%s%d.%s %s (ID: %d)\n",
                     Colors.BOLD.get(), i + 1, Colors.RESET.get(), p.getName(), p.getId());
         }
+
         System.out.print("\nSelect product number: ");
-        System.out.println("Size of products: " + product.getProducts().size());
         int productIndex = getIntInput(1, product.getProducts().size());
-        Product selectedProduct = product.getProducts().get(productIndex-1);
+        Product selectedProduct = product.getProducts().get(productIndex - 1);
+
         System.out.print("Enter rating (1-5): ");
         int rating = getIntInput(1, 5);
         System.out.print("Enter your comment: ");
         String comment = scanner.nextLine();
-        Review.saveReview(productIndex,selectedProduct.getName(),rating,comment);
+
+        Review.saveReview(productIndex, selectedProduct.getName(), rating, comment);
         printSuccess("Thank you for your review!");
         pause();
     }
 
+    /**
+     * Pobiera liczbę całkowitą od użytkownika w określonym zakresie.
+     *
+     * @param min minimalna akceptowalna wartość
+     * @param max maksymalna akceptowalna wartość
+     * @return poprawna wartość w zakresie
+     */
     public static int getIntInput(int min, int max) {
         while (true) {
             Scanner scanner = new Scanner(System.in);
@@ -201,6 +239,12 @@ public class Customer extends Window{
         }
     }
 
+    /**
+     * Wyświetla wszystkie recenzje dla wybranego produktu.
+     *
+     * @param product baza danych produktów
+     * @throws SQLException w przypadku błędów bazy danych
+     */
     static void viewProductReviews(ProductDB product) throws SQLException {
         clearScreen();
         printHeader("Product Reviews");
@@ -211,20 +255,17 @@ public class Customer extends Window{
             return;
         }
 
-
         System.out.println(Colors.BOLD.get() + "Available Products:" + Colors.RESET.get());
         for (int i = 0; i < product.getProducts().size(); i++) {
             Product p = product.getProducts().get(i);
             System.out.printf("%s%d.%s %s (ID: %d)\n",
                     Colors.BOLD.get(), i + 1, Colors.RESET.get(), p.getName(), p.getId());
-            if (p.getId() == 0) {
-                System.out.println("ID = " + 0);
-            }
         }
 
         System.out.print("\nSelect product number: ");
         int productIndex = getIntInput(1, product.getProducts().size()) - 1;
         Product selectedProduct = product.getProducts().get(productIndex);
+
         ReviewDB reviewDB = new ReviewDB();
         List<Review> reviews = reviewDB.getReviewsByProductId(selectedProduct.getId());
 
@@ -238,10 +279,7 @@ public class Customer extends Window{
                     .mapToInt(review -> review.getComment().length())
                     .max()
                     .orElse(20);
-
-
             maxCommentLength = Math.min(maxCommentLength, 50);
-
 
             String separator = Colors.CYAN.get() + "+" + "-".repeat(9) + "+" + "-".repeat(22) + "+" +
                     "-".repeat(maxCommentLength + 2) + "+" + Colors.RESET.get();
@@ -250,7 +288,6 @@ public class Customer extends Window{
                     Colors.PURPLE.get() + Colors.BOLD.get() + " %-" + maxCommentLength + "s " + Colors.CYAN.get() + "|" + Colors.RESET.get() + "\n";
             String rowFormat = Colors.CYAN.get() + "| " + Colors.YELLOW.get() + "%-7d " + Colors.CYAN.get() + "| " + Colors.GREEN.get() + "%-20s " +
                     Colors.CYAN.get() + "| " + Colors.RESET.get() + "%-" + maxCommentLength + "s " + Colors.CYAN.get() + "|" + Colors.RESET.get() + "\n";
-
 
             System.out.println(separator);
             System.out.printf(headerFormat, "Rating", "Date", "Comment");
